@@ -20,7 +20,7 @@ const CoolLink:React.FC<CoolLinkProps> = ({ href, title }) => {
                 <motion.div
                     animate={{ width: isHovering ? '100%' : 0 }}
                     transition={{ duration: 0.25 }}
-                    style={{ background: 'linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet)', height: '2px' }}
+                    className='bg-rainbow h-[2px]'
                 />
             </div>
         </Link>
