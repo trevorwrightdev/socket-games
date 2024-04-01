@@ -16,7 +16,7 @@ const CoolLink:React.FC<CoolLinkProps> = ({ href, title }) => {
     return (
         <Link href={href}>
             <div className={`${isHovering ? 'font-bold' : ''} flex flex-col items-center`} onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)}>
-                <RainbowText text={title}/>
+                {title}
                 <motion.div
                     animate={{ width: isHovering ? '100%' : 0 }}
                     transition={{ duration: 0.25 }}

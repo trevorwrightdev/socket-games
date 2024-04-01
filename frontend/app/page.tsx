@@ -1,4 +1,5 @@
 import CoolLink from 'components/CoolLink'
+import RainbowText from 'components/RainbowText'
 import Input from 'components/Input'
 
 const links = [
@@ -8,7 +9,7 @@ const links = [
 export default function Home() {
   return (
     <main className='flex flex-col items-center pt-24'>
-        <h1 className='text-3xl mb-4 font-bold'>trevdev.fun</h1>
+        <RainbowText className='text-3xl mb-4 font-bold' text='trevdev.fun'/>
         <div className='flex flex-col'>
             <h3 className='text-center mb-4 font-bold'>join a game</h3>
             <h3>CODE</h3>

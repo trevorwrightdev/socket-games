@@ -2,18 +2,19 @@ import React from 'react'
 
 type RainbowTextProps = {
     text: string
+    className?: string
 }
 
-const colors = ['red', 'orange', 'green', 'blue', 'indigo', 'violet']
-
-const RainbowText:React.FC<RainbowTextProps> = ({ text }) => {
+const RainbowText:React.FC<RainbowTextProps> = ({ text, className }) => {
     
-    const rainbowText = text.split('').map((char, index) => (
-        <span key={index} style={{ color: colors[index % colors.length] }}>
-        {char}
-        </span>
-    ))
+    const style = {
+        background: 'linear-gradient(to right, red, orange, green, blue, indigo, violet)',
+        WebkitBackgroundClip: 'text',
+        backgroundClip: 'text',
+        color: 'transparent',
+        display: 'inline',
+    }
 
-  return <div>{rainbowText}</div>
+  return <span style={style} className={className}>{text}</span>
 }
 export default RainbowText
