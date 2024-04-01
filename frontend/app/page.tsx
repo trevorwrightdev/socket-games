@@ -10,7 +10,7 @@ const links = [
 
 export default function Home() {
 
-    const [inputValid, setInputValid] = useState<boolean>(true)
+    const [inputValid, setInputValid] = useState<boolean>(false)
 
   return (
     <main className='flex flex-col items-center pt-24'>
@@ -18,7 +18,7 @@ export default function Home() {
         <div className='flex flex-col'>
             <h3 className='text-center mb-4 font-bold'>join a game</h3>
             <h3>CODE</h3>
-            <Input className='mb-4' placeholder='enter the room code'/>
+            <Input className='mb-4' placeholder='enter room code'/>
             <h3>NAME</h3>
             <Input placeholder='enter your name'/>
         </div>
