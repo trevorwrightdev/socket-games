@@ -19,7 +19,7 @@ export default function Home() {
         <h3 className='text-center mb-4 font-bold mt-8'>host a game</h3>
         <div>
             {links.map((link) => {
-                return <CoolLink key={link.title} href={link.href}>{link.title}</CoolLink>
+                return <CoolLink key={link.title} href={link.href} title={link.title} />
             })}
         </div>
     </main>
