@@ -13,9 +13,9 @@ export default function Home() {
         <div className='flex flex-col'>
             <h3 className='text-center mb-4 font-bold'>join a game</h3>
             <h3>CODE</h3>
-            <Input className='mb-4'/>
+            <Input className='mb-4' placeholder='enter the room code'/>
             <h3>NAME</h3>
-            <Input />
+            <Input placeholder='enter your name'/>
         </div>
         <h3 className='text-center mb-4 font-bold mt-8'>host a game</h3>
         <div>
