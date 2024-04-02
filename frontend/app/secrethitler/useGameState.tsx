@@ -6,7 +6,7 @@ interface GameState {
 
 const defaultGameState: GameState = { page: 'Main Menu' }
 
-export function useGameState() {
+export function useGameState(): [GameState, (newState: Partial<GameState>) => void] {
     const [gameState, setGameState] = useState<GameState>(defaultGameState)
 
     function updateGameState(newState: Partial<GameState>) {
