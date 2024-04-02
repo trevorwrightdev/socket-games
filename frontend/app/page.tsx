@@ -1,11 +1,12 @@
 'use client'
-import CoolLink from 'components/CoolLink'
+import CoolButton from '@/app/components/CoolButton'
+import Link from 'next/link'
 import RainbowText from 'components/RainbowText'
 import Input from 'components/Input'
 import { useState } from 'react'
 
 const links = [
-    { title: 'Secret Hitler', href: '/secrethitler' },
+    { title: 'Secret Hitler', href: '/secrethitler/host' },
 ]
 
 export default function Home() {
@@ -26,7 +27,11 @@ export default function Home() {
         <h3 className='text-center mb-4 font-bold mt-8'>host a game</h3>
         <div>
             {links.map((link) => {
-                return <CoolLink key={link.title} href={link.href} title={link.title} />
+                return (
+                    <Link href={link.href}>
+                        <CoolButton key={link.title}>{link.title}</CoolButton>
+                    </Link>
+                )
             })}
         </div>
     </main>

@@ -16,10 +16,10 @@ app.get('/', (req, res) => {
 
 // Handle a connection
 io.on('connection', (socket) => {
-  console.log('a user connected')
+  console.log(`User ${socket.id} connected.`)
 
   socket.on('disconnect', () => {
-    console.log('user disconnected')
+    console.log(`User ${socket.id} disconnected.`)
   })
 })
 
