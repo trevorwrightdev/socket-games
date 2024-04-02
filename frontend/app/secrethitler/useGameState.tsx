@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 
-export type Page = 'Main Menu' | 'How to Play' | 'Loading'
+export type Page = 'Main Menu' | 'How to Play' | 'Loading' | 'Waiting Room'
+
 export type UpdateGameState = (newState: Partial<GameState>) => void
 
 interface GameState {

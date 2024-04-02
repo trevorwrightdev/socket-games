@@ -3,6 +3,7 @@ import MainMenu from './MainMenu'
 import { useGameState } from '../useGameState'
 import FadeContainer from 'components/FadeContainer'
 import Loading from './Loading'
+import WaitingRoom from './WaitingRoom'
 
 export default function SecretHitlerHostPage() {
 
@@ -18,6 +19,9 @@ export default function SecretHitlerHostPage() {
         )}
         {currentPage === 'Loading' && (
             <Loading />
+        )}
+        {currentPage === 'Waiting Room' && (
+            <WaitingRoom />
         )}
     </FadeContainer>
   )

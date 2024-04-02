@@ -1,6 +1,7 @@
 import express from 'express'
 import { Server as SocketIOServer } from 'socket.io'
 import http from 'http'
+import { CodeGenerator } from './lib/codegenerator'
 
 // Initialize express app and HTTP server
 const app = express();
@@ -18,13 +19,15 @@ app.get('/', (req, res) => {
 io.on('connection', (socket) => {
   console.log(`User ${socket.id} connected.`)
 
+
+
   socket.on('disconnect', () => {
     console.log(`User ${socket.id} disconnected.`)
   })
 })
 
 // Start the server
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT || 3002
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}.`)
 })

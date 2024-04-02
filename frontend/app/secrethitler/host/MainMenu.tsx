@@ -14,7 +14,7 @@ const MainMenu:React.FC<MainMenuProps> = ({ updateGameState }) => {
         <div className='w-full h-screen grid place-items-center'>
             <div className='flex flex-col items-center gap-4'>
                 <RainbowText className='text-3xl font-bold' text='Secret Hitler'/>
-                <CoolButton>Start Game</CoolButton>
+                <CoolButton onClick={() => updateGameState({ page: 'Waiting Room' })}>Start Game</CoolButton>
                 <CoolButton onClick={() => updateGameState({ page: 'How to Play' })}>How to Play</CoolButton>
                 <Link href='/'>
                     <CoolButton>Back</CoolButton>
