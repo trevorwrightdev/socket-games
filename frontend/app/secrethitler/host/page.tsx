@@ -2,7 +2,6 @@
 import io from 'socket.io-client'
 import MainMenu from './MainMenu'
 import { useGameState, Page } from '../useGameState'
-import { useState, useEffect } from 'react'
 import FadeContainer from 'components/FadeContainer'
 
 const socket = io('http://localhost:3001')

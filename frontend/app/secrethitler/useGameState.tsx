@@ -22,10 +22,10 @@ export function useGameState(): { gameState: GameState; updateGameState: UpdateG
     }
 
     useEffect(() => {
-        setFade(false)
+        setFade(true)
         setTimeout(() => {
             setCurrentPage(gameState.page)
-            setFade(true)
+            setFade(false)
         }, 250)
     }, [gameState.page])
 
