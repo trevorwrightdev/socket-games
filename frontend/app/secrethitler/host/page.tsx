@@ -1,10 +1,8 @@
 'use client'
-import io from 'socket.io-client'
 import MainMenu from './MainMenu'
-import { useGameState, Page } from '../useGameState'
+import { useGameState } from '../useGameState'
 import FadeContainer from 'components/FadeContainer'
-
-const socket = io('http://localhost:3001')
+import Loading from './Loading'
 
 export default function SecretHitlerHostPage() {
 
@@ -17,6 +15,9 @@ export default function SecretHitlerHostPage() {
         )}
         {currentPage === 'How to Play' && (
             <div className='grid place-items-center w-full h-screen'>nice</div>
+        )}
+        {currentPage === 'Loading' && (
+            <Loading />
         )}
     </FadeContainer>
   )
