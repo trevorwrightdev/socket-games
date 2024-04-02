@@ -1,13 +1,18 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+
+export type Page = 'Main Menu' | 'How to Play' 
+export type UpdateGameState = (newState: Partial<GameState>) => void
 
 interface GameState {
-    page: 'Main Menu'
+    page: Page
 }
 
 const defaultGameState: GameState = { page: 'Main Menu' }
 
-export function useGameState(): [GameState, (newState: Partial<GameState>) => void] {
+export function useGameState(): { gameState: GameState; updateGameState: UpdateGameState, fade: boolean, currentPage: Page } {
     const [gameState, setGameState] = useState<GameState>(defaultGameState)
+    const [currentPage, setCurrentPage] = useState<Page>(gameState.page)
+    const [fade, setFade] = useState<boolean>(false)
 
     function updateGameState(newState: Partial<GameState>) {
         setGameState({
@@ -16,5 +21,18 @@ export function useGameState(): [GameState, (newState: Partial<GameState>) => vo
         })
     }
 
-    return [gameState, updateGameState]
+    useEffect(() => {
+        setFade(false)
+        setTimeout(() => {
+            setCurrentPage(gameState.page)
+            setFade(true)
+        }, 250)
+    }, [gameState.page])
+
+    return {
+        gameState,
+        updateGameState,
+        fade,
+        currentPage
+    }
 }
