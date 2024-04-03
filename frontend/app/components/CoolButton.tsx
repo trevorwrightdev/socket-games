@@ -1,7 +1,6 @@
 'use client'
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
-import RainbowText from 'components/RainbowText'
 
 type CoolButtonProps = {
     children?: React.ReactNode

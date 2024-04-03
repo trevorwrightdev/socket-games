@@ -15,7 +15,7 @@ export default function Home() {
 
   return (
     <main className='flex flex-col items-center pt-24'>
-        <RainbowText className='text-3xl mb-4 font-bold' text='trevdev.fun'/>
+        <RainbowText className='text-3xl mb-4 font-bold'>trevdev.fun</RainbowText>
         <div className='flex flex-col'>
             <h3 className='text-center mb-4 font-bold'>join a game</h3>
             <h3>CODE</h3>
@@ -28,8 +28,8 @@ export default function Home() {
         <div>
             {links.map((link) => {
                 return (
-                    <Link href={link.href}>
-                        <CoolButton key={link.title}>{link.title}</CoolButton>
+                    <Link href={link.href} key={link.title}>
+                        <CoolButton >{link.title}</CoolButton>
                     </Link>
                 )
             })}

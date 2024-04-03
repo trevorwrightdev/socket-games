@@ -1,3 +1,5 @@
+import { randomBytes } from 'crypto'
+
 export class CodeGenerator {
     private static CHARS: string = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
     private static CODE_LENGTH: number = 4
@@ -7,10 +9,9 @@ export class CodeGenerator {
         let code = ''
         
         do {
-            code = ''
-            for (let i = 0; i < CodeGenerator.CODE_LENGTH; i++) {
-                code += CodeGenerator.CHARS.charAt(Math.floor(Math.random() * CodeGenerator.CHARS.length))
-            }
+            // Generate a random index for each character in the code
+            const bytes = randomBytes(CodeGenerator.CODE_LENGTH)
+            code = Array.from(bytes).map((byte) => CodeGenerator.CHARS.charAt(byte % CodeGenerator.CHARS.length)).join('')
         } while (CodeGenerator.codes_generated.includes(code))
         
         CodeGenerator.codes_generated.push(code)

@@ -21,7 +21,7 @@ export default function SecretHitlerHostPage() {
             <Loading />
         )}
         {currentPage === 'Waiting Room' && (
-            <WaitingRoom />
+            <WaitingRoom gameState={gameState} updateGameState={updateGameState}/>
         )}
     </FadeContainer>
   )

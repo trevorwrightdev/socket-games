@@ -1,11 +1,11 @@
 import React from 'react'
 
 type RainbowTextProps = {
-    text: string
+    children?: React.ReactNode
     className?: string
 }
 
-const RainbowText:React.FC<RainbowTextProps> = ({ text, className }) => {
+const RainbowText:React.FC<RainbowTextProps> = ({ children, className }) => {
     
     const style = {
         background: 'linear-gradient(to right, red, orange, green, blue, indigo, violet)',
@@ -15,6 +15,6 @@ const RainbowText:React.FC<RainbowTextProps> = ({ text, className }) => {
         display: 'inline',
     }
 
-  return <span style={style} className={className}>{text}</span>
+  return <span style={style} className={className}>{children}</span>
 }
 export default RainbowText
