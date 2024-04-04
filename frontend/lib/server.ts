@@ -29,6 +29,10 @@ class Server {
         this.socket.emit('createRoom', gameType)
     }
 
+    public joinRoom(code: string) {
+        this.socket.emit('joinRoom', code)
+    }
+
     public async validateCode(code: string): Promise<[any, string | null]> {
         return await betterFetch(`${api_url}/codevalid?code=${code}`)
     }

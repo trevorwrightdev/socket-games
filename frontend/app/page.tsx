@@ -11,7 +11,6 @@ const links = [
 ]
 
 export default function Home() {
-
     const [codeValid, setcodeValid] = useState<boolean>(false)
     const [code, setCode] = useState<string>('')
     const [name, setName] = useState<string>('')
@@ -29,6 +28,10 @@ export default function Home() {
         if (!error) {
             setcodeValid(data)
         }
+    }
+
+    function handleJoinGame() {
+        server.joinRoom(code)
     }
 
   return (

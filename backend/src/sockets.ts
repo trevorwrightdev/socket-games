@@ -6,12 +6,11 @@ export default function socketEvents(socket: Socket, socketGames: SocketGames) {
     console.log(`User ${socket.id} connected.`)
 
     socket.on('createRoom', (gameType: GameType) => {
-        if (!isValidGame(gameType)) {
-            socket.emit('error', 'Invalid game type.')
-            return
-        }
-
         socketGames.createRoom(gameType, socket)
+    })
+
+    socket.on('joinRoom', (code: string) => {
+        socketGames.joinRoom(code, socket)
     })
 
     socket.on('disconnect', () => {
