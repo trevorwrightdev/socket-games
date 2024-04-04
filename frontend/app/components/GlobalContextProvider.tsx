@@ -5,11 +5,13 @@ import { ReactNode, createContext, useContext, useState } from 'react'
 interface GlobalStateType {
     currentGame: GameType
     name: string
+    roomCode: string
 }
 
 const defaultGlobalState: GlobalStateType = {
     currentGame: 'None',
-    name: ''
+    name: '',
+    roomCode: '',
 }
 
 type GlobalContextType = [GlobalStateType, (state: Partial<GlobalStateType>) => void]

@@ -55,7 +55,11 @@ export class SocketGames {
         console.log(`User ${socket.id} joined room ${code}.`)
 
         const gameType = game.gameType
-        socket.emit('roomJoined', gameType)
+        socket.emit('roomJoined', {
+            gameType,
+            name,
+            roomCode: code,
+        })
     }
 
     public codeIsValid(code: string): boolean {

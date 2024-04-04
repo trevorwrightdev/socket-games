@@ -6,6 +6,7 @@ import Input from 'components/Input'
 import { useState, useEffect } from 'react'
 import server, { GameType } from '@/lib/server'
 import { useGlobalState } from './components/GlobalContextProvider'
+import { useRouter } from 'next/navigation'
 
 const links = [
     { title: 'Secret Hitler', href: '/secrethitler/host' },
@@ -19,6 +20,8 @@ export default function Home() {
     const [loading, setLoading] = useState<boolean>(false)
 
     const [globalState, updateGlobalState] = useGlobalState()
+
+    const router = useRouter()
 
     async function handleCodeChange(e: React.ChangeEvent<HTMLInputElement>) {
         const newCode = e.target.value
@@ -46,10 +49,13 @@ export default function Home() {
 
             setError(message)
         })
-        server.socket.on('roomJoined', (gameType: GameType) => {
+        server.socket.on('roomJoined', (response: { gameType: GameType, name: string, roomCode: string 
+        }) => {
             setLoading(false)
-
-            updateGlobalState({ currentGame: gameType, name })
+            updateGlobalState({ currentGame: response.gameType, name: response.name, roomCode: response.roomCode })
+            if (response.gameType === 'Secret Hitler') {
+                router.push('/secrethitler/play')
+            }
         })
 
         return () => {
