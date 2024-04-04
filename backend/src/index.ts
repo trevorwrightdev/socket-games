@@ -3,7 +3,7 @@ import { Server as SocketIOServer } from 'socket.io'
 import http from 'http'
 import { SocketGames } from './lib/SocketGames'
 import routes from './routes'
-import sockets from './sockets'
+import socketEvents from './sockets'
 
 require('dotenv').config()
 
@@ -23,7 +23,7 @@ const socketGames = new SocketGames()
 
 // Handle a connection
 io.on('connection', (socket) => {
-    sockets(socket, socketGames)
+    socketEvents(socket, socketGames)
 })
 
 // Set up routes

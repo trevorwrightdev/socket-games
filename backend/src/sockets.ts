@@ -2,7 +2,7 @@ import { Socket } from 'socket.io'
 import { isValidGame, GameType } from './lib/utils'
 import { SocketGames } from './lib/SocketGames'
 
-export default function sockets(socket: Socket, socketGames: SocketGames) {
+export default function socketEvents(socket: Socket, socketGames: SocketGames) {
     console.log(`User ${socket.id} connected.`)
 
     socket.on('createRoom', (gameType: GameType) => {
