@@ -12,21 +12,22 @@ const links = [
 
 export default function Home() {
 
-    const [inputValid, setInputValid] = useState<boolean>(false)
+    const [codeValid, setcodeValid] = useState<boolean>(false)
     const [code, setCode] = useState<string>('')
+    const [name, setName] = useState<string>('')
 
     async function handleCodeChange(e: React.ChangeEvent<HTMLInputElement>) {
         const newCode = e.target.value
         setCode(newCode)
 
         if (newCode.length !== 4) {
-            setInputValid(false)
+            setcodeValid(false)
             return
         }
 
         const [data, error] = await server.validateCode(newCode)
         if (!error) {
-            setInputValid(data)
+            setcodeValid(data)
         }
     }
 
@@ -38,9 +39,9 @@ export default function Home() {
             <h3>CODE</h3>
             <Input className='mb-4' placeholder='enter room code' value={code} onChange={handleCodeChange} maxLength={4}/>
             <h3>NAME</h3>
-            <Input placeholder='enter your name'/>
+            <Input placeholder='enter your name' maxLength={10} value={name} onChange={(e) => setName(e.target.value)}/>
         </div>
-        <button className={`${inputValid ? 'bg-rainbow-less text-white' : 'bg-white text-primary pointer-events-none'} w-20 rounded-md py-2 mt-4`}>PLAY</button>
+        <button className={`${(codeValid && name) ? 'bg-rainbow-less text-white' : 'bg-white text-primary pointer-events-none'} w-20 rounded-md py-2 mt-4`}>PLAY</button>
         <h3 className='text-center mb-4 font-bold mt-8'>host a game</h3>
         <div>
             {links.map((link) => {
