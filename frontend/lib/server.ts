@@ -29,8 +29,8 @@ class Server {
         this.socket.emit('createRoom', gameType)
     }
 
-    public joinRoom(code: string) {
-        this.socket.emit('joinRoom', code)
+    public joinRoom(code: string, name: string) {
+        this.socket.emit('joinRoom', { code, name })
     }
 
     public async validateCode(code: string): Promise<[any, string | null]> {

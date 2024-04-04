@@ -9,8 +9,8 @@ export default function socketEvents(socket: Socket, socketGames: SocketGames) {
         socketGames.createRoom(gameType, socket)
     })
 
-    socket.on('joinRoom', (code: string) => {
-        socketGames.joinRoom(code, socket)
+    socket.on('joinRoom', ({ code, name }) => {
+        socketGames.joinRoom(code, name, socket)
     })
 
     socket.on('disconnect', () => {

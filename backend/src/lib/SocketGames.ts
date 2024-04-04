@@ -30,7 +30,6 @@ export class SocketGames {
             const game = new SecretHitler()
             this.roomCodeToGame[roomCode] = game
             this.userToRoomCode[socket.id] = roomCode
-            game.addPlayer(socket.id)
         }
 
         socket.join(roomCode)
@@ -38,16 +37,23 @@ export class SocketGames {
         socket.emit('roomCreated', roomCode)
     }
 
-    public joinRoom(code: string, socket: Socket) {
+    public joinRoom(code: string, name: string, socket: Socket) {
         if (!this.codeIsValid(code)) {
             socket.emit('error', 'Invalid room code.')
+            return
+        } 
+
+        if (name === '' || name.length > 10) {
+            socket.emit('error', 'Invalid name.')
             return
         }
 
         const game = this.roomCodeToGame[code]
-        game.addPlayer(socket.id)
+        game.addPlayer(socket.id, name)
         socket.join(code)
+        
         console.log(`User ${socket.id} joined room ${code}.`)
+
         const gameType = game.gameType
         socket.emit('roomJoined', gameType)
     }
