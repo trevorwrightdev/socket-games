@@ -22,7 +22,7 @@ export class SocketGames {
         } while (this.roomCodeToGame[roomCode])
 
         if (gameType === 'Secret Hitler') {
-            const game = new SecretHitler(socket)
+            const game = new SecretHitler()
             this.roomCodeToGame[roomCode] = game
             this.userToRoomCode[socket.id] = roomCode
         }
