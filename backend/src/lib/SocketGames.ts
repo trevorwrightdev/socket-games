@@ -32,4 +32,8 @@ export class SocketGames {
         socket.emit('roomCreated', roomCode)
     }
 
+    public codeIsValid(code: string): boolean {
+        return !!this.roomCodeToGame[code]
+    }
+
 }

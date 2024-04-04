@@ -1,8 +1,9 @@
 import express from 'express'
 import { Server as SocketIOServer } from 'socket.io'
 import http from 'http'
-import { GameType, isValidGame } from './lib/utils'
 import { SocketGames } from './lib/SocketGames'
+import routes from './routes'
+import sockets from './sockets'
 
 require('dotenv').config()
 
@@ -17,31 +18,16 @@ const io = new SocketIOServer(server, {
   }
 })
 
-// Serve a simple test route
-app.get('/', (req, res) => {
-    res.send('<h1>Hello world</h1>')
-})
-
 // Initialize SocketGames
 const socketGames = new SocketGames()
 
 // Handle a connection
 io.on('connection', (socket) => {
-    console.log(`User ${socket.id} connected.`)
-
-    socket.on('createRoom', (gameType: GameType) => {
-        if (!isValidGame(gameType)) {
-            socket.emit('error', 'Invalid game type.')
-            return
-        }
-
-        socketGames.createRoom(gameType, socket)
-    })
-
-    socket.on('disconnect', () => {
-        console.log(`User ${socket.id} disconnected.`)
-    })
+    sockets(socket, socketGames)
 })
+
+// Set up routes
+app.use(routes(socketGames))
 
 // Start the server
 const PORT = process.env.PORT || 3002
