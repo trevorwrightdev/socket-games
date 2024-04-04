@@ -4,12 +4,17 @@ import http from 'http'
 import { SocketGames } from './lib/SocketGames'
 import routes from './routes'
 import socketEvents from './sockets'
+import cors from 'cors'
 
 require('dotenv').config()
 
 // Initialize express app and HTTP server
-const app = express();
+const app = express()
 const server = http.createServer(app)
+
+app.use(cors({
+    origin: process.env.FRONTEND_URL
+}))
 
 // Initialize Socket.IO server
 const io = new SocketIOServer(server, {

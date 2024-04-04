@@ -4,6 +4,7 @@ import Link from 'next/link'
 import RainbowText from 'components/RainbowText'
 import Input from 'components/Input'
 import { useState } from 'react'
+import server from '@/lib/server'
 
 const links = [
     { title: 'Secret Hitler', href: '/secrethitler/host' },
@@ -12,6 +13,22 @@ const links = [
 export default function Home() {
 
     const [inputValid, setInputValid] = useState<boolean>(false)
+    const [code, setCode] = useState<string>('')
+
+    async function handleCodeChange(e: React.ChangeEvent<HTMLInputElement>) {
+        const newCode = e.target.value
+        setCode(newCode)
+
+        if (newCode.length !== 4) {
+            setInputValid(false)
+            return
+        }
+
+        const [data, error] = await server.validateCode(newCode)
+        if (!error) {
+            setInputValid(data)
+        }
+    }
 
   return (
     <main className='flex flex-col items-center pt-24'>
@@ -19,7 +36,7 @@ export default function Home() {
         <div className='flex flex-col'>
             <h3 className='text-center mb-4 font-bold'>join a game</h3>
             <h3>CODE</h3>
-            <Input className='mb-4' placeholder='enter room code'/>
+            <Input className='mb-4' placeholder='enter room code' value={code} onChange={handleCodeChange} maxLength={4}/>
             <h3>NAME</h3>
             <Input placeholder='enter your name'/>
         </div>
