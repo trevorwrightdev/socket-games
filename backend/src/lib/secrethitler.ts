@@ -1,13 +1,9 @@
 import { Socket } from 'socket.io'
+import Game from './Game'
 
-export interface SecretHitlerGameState {
-    players: string[]
-}
+export class SecretHitler extends Game {
 
-export const getDefaultSecretHitlerGameState = (): SecretHitlerGameState => ({
-    players: []
-})
-
-function secretHitler(socket: Socket, gameState: SecretHitlerGameState) {
-    
+    constructor(socket: Socket) {
+        super(socket)
+    }
 }

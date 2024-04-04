@@ -1,10 +1,10 @@
-import { SecretHitlerGameState, getDefaultSecretHitlerGameState } from './secrethitler'
+import { SecretHitler } from './secrethitler'
 import { GameType } from './utils'
 import { CodeGenerator } from './codegenerator'
 import { Socket } from 'socket.io'
 
 type RoomCodeToGame = {
-    [key: string]: SecretHitlerGameState
+    [key: string]: SecretHitler
 }
 
 type UserToRoomCode = {
@@ -22,9 +22,8 @@ export class SocketGames {
         } while (this.roomCodeToGame[roomCode])
 
         if (gameType === 'Secret Hitler') {
-            const defaultState = getDefaultSecretHitlerGameState()
-            defaultState.players.push(socket.id)
-            this.roomCodeToGame[roomCode] = defaultState
+            const game = new SecretHitler(socket)
+            this.roomCodeToGame[roomCode] = game
             this.userToRoomCode[socket.id] = roomCode
         }
 
