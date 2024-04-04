@@ -4,9 +4,9 @@ export interface SecretHitlerGameState {
     players: string[]
 }
 
-export const defaultSecretHitlerGameState: SecretHitlerGameState = {
+export const getDefaultSecretHitlerGameState = (): SecretHitlerGameState => ({
     players: []
-}
+})
 
 function secretHitler(socket: Socket, gameState: SecretHitlerGameState) {
     

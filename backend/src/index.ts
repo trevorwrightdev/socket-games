@@ -1,9 +1,8 @@
 import express from 'express'
 import { Server as SocketIOServer } from 'socket.io'
 import http from 'http'
-import { CodeGenerator } from './lib/codegenerator'
-import { GameType, Games, isValidGame } from './lib/utils'
-import { defaultSecretHitlerGameState } from './lib/secrethitler'
+import { GameType, isValidGame } from './lib/utils'
+import { SocketGames } from './lib/SocketGames'
 
 require('dotenv').config()
 
@@ -23,7 +22,8 @@ app.get('/', (req, res) => {
     res.send('<h1>Hello world</h1>')
 })
 
-const games: Games = {}
+// Initialize SocketGames
+const socketGames = new SocketGames()
 
 // Handle a connection
 io.on('connection', (socket) => {
@@ -35,18 +35,7 @@ io.on('connection', (socket) => {
             return
         }
 
-        let roomCode = ''
-        do {
-            roomCode = CodeGenerator.generate()
-        } while (games[roomCode])
-
-        if (gameType === 'Secret Hitler') {
-            games[roomCode] = defaultSecretHitlerGameState
-        }
-
-        socket.join(roomCode)
-        console.log(`User ${socket.id} created room ${roomCode} for game ${gameType}.`)
-        socket.emit('roomCreated', roomCode)
+        socketGames.createRoom(gameType, socket)
     })
 
     socket.on('disconnect', () => {
