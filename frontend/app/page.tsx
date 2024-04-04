@@ -4,7 +4,8 @@ import Link from 'next/link'
 import RainbowText from 'components/RainbowText'
 import Input from 'components/Input'
 import { useState, useEffect } from 'react'
-import server from '@/lib/server'
+import server, { GameType } from '@/lib/server'
+import { useGlobalState } from './components/GlobalContextProvider'
 
 const links = [
     { title: 'Secret Hitler', href: '/secrethitler/host' },
@@ -15,6 +16,9 @@ export default function Home() {
     const [code, setCode] = useState<string>('')
     const [name, setName] = useState<string>('')
     const [error, setError] = useState<string>('')
+    const [loading, setLoading] = useState<boolean>(false)
+
+    const [globalState, updateGlobalState] = useGlobalState()
 
     async function handleCodeChange(e: React.ChangeEvent<HTMLInputElement>) {
         const newCode = e.target.value
@@ -33,14 +37,19 @@ export default function Home() {
 
     function handleJoinGame() {
         server.joinRoom(code, name)
+        setLoading(true)
     }
 
     useEffect(() => {
         server.socket.on('error', (message: string) => {
+            setLoading(false)
+
             setError(message)
         })
-        server.socket.on('roomJoined', (gameType: string) => {
-            console.log('roomJoined', gameType)
+        server.socket.on('roomJoined', (gameType: GameType) => {
+            setLoading(false)
+
+            updateGlobalState({ currentGame: gameType, name })
         })
 
         return () => {
@@ -59,7 +68,7 @@ export default function Home() {
             <h3>NAME</h3>
             <Input placeholder='enter your name' maxLength={10} value={name} onChange={(e) => setName(e.target.value)}/>
         </div>
-        <button className={`${(codeValid && name) ? 'bg-rainbow-less text-white' : 'bg-white text-primary'} w-20 rounded-md py-2 mt-4 mb-4`} onClick={handleJoinGame}>PLAY</button>
+        <button className={`${(codeValid && name) ? 'bg-rainbow-less text-white' : 'bg-white text-primary pointer-events-none'} ${loading ? 'pointer-events-none' : ''} w-20 rounded-md py-2 mt-4 mb-4`} onClick={handleJoinGame}>PLAY</button>
         <p className='text-red-500'>{error}</p>
         <h3 className='text-center mb-4 font-bold mt-4'>host a game</h3>
         <div>

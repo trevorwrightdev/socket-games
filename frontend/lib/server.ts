@@ -1,6 +1,6 @@
 import io from 'socket.io-client'
 
-type GameType = 'Secret Hitler'
+export type GameType = 'None' | 'Secret Hitler' 
 
 const api_url: string = process.env.NEXT_PUBLIC_API_URL as string
 
