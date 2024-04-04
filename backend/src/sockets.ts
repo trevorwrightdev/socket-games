@@ -1,5 +1,5 @@
 import { Socket } from 'socket.io'
-import { isValidGame, GameType } from './lib/utils'
+import { GameType } from './lib/utils'
 import { SocketGames } from './lib/SocketGames'
 
 export default function socketEvents(socket: Socket, socketGames: SocketGames) {
