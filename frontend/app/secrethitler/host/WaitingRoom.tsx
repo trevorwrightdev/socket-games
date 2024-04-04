@@ -14,7 +14,7 @@ const WaitingRoom:React.FC<WaitingRoomProps> = ({ gameState, updateGameState }) 
             <div className='grid place-items-center gap-4'>
                 <h1 className='text-3xl font-bold'>Room Code: <RainbowText>{gameState.roomCode}</RainbowText></h1>
                 <div className='flex flex-col items-center'>
-                    
+                    {/* TODO: List players here */}
                 </div>
             </div>
         </div>

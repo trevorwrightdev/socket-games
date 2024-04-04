@@ -2,7 +2,8 @@ import express from 'express'
 import { Server as SocketIOServer } from 'socket.io'
 import http from 'http'
 import { CodeGenerator } from './lib/codegenerator'
-import { GameType } from './lib/types'
+import { GameType, Games } from './lib/utils'
+import { defaultSecretHitlerGameState } from './lib/secrethitler'
 
 require('dotenv').config()
 
@@ -22,12 +23,22 @@ app.get('/', (req, res) => {
     res.send('<h1>Hello world</h1>')
 })
 
+const games: Games = {}
+
 // Handle a connection
 io.on('connection', (socket) => {
     console.log(`User ${socket.id} connected.`)
 
     socket.on('createRoom', (gameType: GameType) => {
-        const roomCode = CodeGenerator.generate()
+        let roomCode = ''
+        do {
+            roomCode = CodeGenerator.generate()
+        } while (games[roomCode])
+
+        if (gameType === 'Secret Hitler') {
+            games[roomCode] = defaultSecretHitlerGameState
+        }
+
         socket.join(roomCode)
         console.log(`User ${socket.id} created room ${roomCode} for game ${gameType}.`)
         socket.emit('roomCreated', roomCode)

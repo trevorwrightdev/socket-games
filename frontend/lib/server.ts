@@ -1,5 +1,6 @@
 import io from 'socket.io-client'
-import { GameType } from './types'
+
+type GameType = 'Secret Hitler'
 
 class Server {
     public socket = io(process.env.NEXT_PUBLIC_API_URL as string)
