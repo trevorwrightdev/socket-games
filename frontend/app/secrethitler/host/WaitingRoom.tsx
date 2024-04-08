@@ -14,6 +14,7 @@ type WaitingRoomProps = {
 const WaitingRoom:React.FC<WaitingRoomProps> = ({ gameState, updateGameState }) => {
 
     const [players, setPlayers] = useState<Player[]>([])
+    const [loading, setLoading] = useState(false)
 
     useEffect(() => {
 
@@ -21,11 +22,19 @@ const WaitingRoom:React.FC<WaitingRoomProps> = ({ gameState, updateGameState }) 
         server.socket.on('playerJoined', (players: Player[]) => {
             setPlayers(players)
         })
+        server.socket.on('gameStarted', () => {
+            updateGameState({ page: 'Counter' })
+        })
 
         return () => {
             server.socket.off('playerJoined')
+            server.socket.off('gameStarted')
         }
     }, [])
+
+    function handlePlay() {
+        server.socket.emit('startGame')
+    }
     
     return (
         <div className='w-full h-screen grid place-items-center'>
@@ -37,7 +46,7 @@ const WaitingRoom:React.FC<WaitingRoomProps> = ({ gameState, updateGameState }) 
                     {players.map((player, index) => (
                         <div key={index} className='text-xl'>{player.name}</div>
                     ))}
-                    <RainbowButton disabled={players.length === 0}>PLAY</RainbowButton>
+                    <RainbowButton disabled={players.length === 0} loading={loading} onClick={handlePlay}>PLAY</RainbowButton>
                 </div>
             </div>
         </div>

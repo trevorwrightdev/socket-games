@@ -1,4 +1,4 @@
-import { SecretHitler } from './secrethitler'
+import { SecretHitler } from './secrethitler/secrethitler'
 import { GameType, isValidGame } from './utils'
 import { CodeGenerator } from './codegenerator'
 import { Server, Socket } from 'socket.io'
@@ -12,9 +12,11 @@ type UserToRoomCode = {
     [key: string]: string
 }
 
+type OnEventCallback = (args: { game: Game }) => void
+
 export class SocketGames {
-    private roomCodeToGame: RoomCodeToGame = {}
-    private userToRoomCode: UserToRoomCode = {}
+    public roomCodeToGame: RoomCodeToGame = {}
+    public userToRoomCode: UserToRoomCode = {}
 
     public createRoom(gameType: GameType, socket: Socket) {
         if (!isValidGame(gameType)) {
@@ -28,6 +30,7 @@ export class SocketGames {
         } while (this.roomCodeToGame[roomCode])
 
         let game = new Game()
+        game.roomCode = roomCode
         if (gameType === 'Secret Hitler') {
             game = new SecretHitler()
         }
@@ -53,6 +56,17 @@ export class SocketGames {
         }
 
         const game = this.roomCodeToGame[code]
+
+        if (game.getPlayers().length >= game.maxPlayers) {
+            socket.emit('error', 'Room is full.')
+            return
+        }
+
+        if (game.inProgress) {
+            socket.emit('error', 'Game has already started.')
+            return
+        }
+
         game.addPlayer(socket.id, name)
         socket.join(code)
         
@@ -71,4 +85,10 @@ export class SocketGames {
         return !!this.roomCodeToGame[code]
     }
 
+    public On(eventName: string, socket: Socket, callback: OnEventCallback) {
+        socket.on(eventName, () => {
+            const game = this.roomCodeToGame[this.userToRoomCode[socket.id]]
+            callback({ game })
+        })
+    }
 }

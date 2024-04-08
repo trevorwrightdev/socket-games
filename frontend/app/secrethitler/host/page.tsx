@@ -4,6 +4,7 @@ import { useGameState } from '../useGameState'
 import FadeContainer from 'components/FadeContainer'
 import Loading from './Loading'
 import WaitingRoom from './WaitingRoom'
+import Counter from './Counter'
 
 export default function SecretHitlerHostPage() {
 
@@ -22,6 +23,9 @@ export default function SecretHitlerHostPage() {
         )}
         {currentPage === 'Waiting Room' && (
             <WaitingRoom gameState={gameState} updateGameState={updateGameState}/>
+        )}
+        {currentPage === 'Counter' && (
+            <Counter />
         )}
     </FadeContainer>
   )
