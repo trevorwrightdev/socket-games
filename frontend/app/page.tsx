@@ -4,9 +4,11 @@ import Link from 'next/link'
 import RainbowText from 'components/RainbowText'
 import Input from 'components/Input'
 import { useState, useEffect } from 'react'
-import server, { GameType } from '@/lib/server'
+import server from '@/lib/server'
 import { useGlobalState } from './components/GlobalContextProvider'
 import { useRouter } from 'next/navigation'
+import { GameType } from '@/lib/utils'
+import RainbowButton from './components/RainbowButton'
 
 const links = [
     { title: 'Secret Hitler', href: '/secrethitler/host' },
@@ -74,7 +76,7 @@ export default function Home() {
             <h3>NAME</h3>
             <Input placeholder='enter your name' maxLength={10} value={name} onChange={(e) => setName(e.target.value)}/>
         </div>
-        <button className={`${(codeValid && name) ? 'bg-rainbow-less text-white' : 'bg-white text-primary pointer-events-none'} ${loading ? 'pointer-events-none' : ''} w-20 rounded-md py-2 mt-4 mb-4`} onClick={handleJoinGame}>PLAY</button>
+        <RainbowButton disabled={!codeValid || !name} loading={loading} onClick={handleJoinGame}>PLAY</RainbowButton>
         <p className='text-red-500'>{error}</p>
         <h3 className='text-center mb-4 font-bold mt-4'>host a game</h3>
         <div>

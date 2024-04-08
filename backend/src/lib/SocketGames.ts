@@ -1,7 +1,7 @@
 import { SecretHitler } from './secrethitler'
 import { GameType, isValidGame } from './utils'
 import { CodeGenerator } from './codegenerator'
-import { Socket } from 'socket.io'
+import { Server, Socket } from 'socket.io'
 import Game from './Game'
 
 type RoomCodeToGame = {
@@ -41,7 +41,7 @@ export class SocketGames {
         socket.emit('roomCreated', roomCode)
     }
 
-    public joinRoom(code: string, name: string, socket: Socket) {
+    public joinRoom(code: string, name: string, socket: Socket, io: Server) {
         if (!this.codeIsValid(code)) {
             socket.emit('error', 'Invalid room code.')
             return
@@ -64,6 +64,7 @@ export class SocketGames {
             name,
             roomCode: code,
         })
+        io.to(game.host).emit('playerJoined', game.getPlayers())
     }
 
     public codeIsValid(code: string): boolean {

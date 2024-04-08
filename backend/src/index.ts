@@ -28,7 +28,7 @@ const socketGames = new SocketGames()
 
 // Handle a connection
 io.on('connection', (socket) => {
-    socketEvents(socket, socketGames)
+    socketEvents(io, socket, socketGames)
 })
 
 // Set up routes
