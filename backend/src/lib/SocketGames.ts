@@ -5,7 +5,7 @@ import { Server, Socket } from 'socket.io'
 import Game from './Game'
 
 type RoomCodeToGame = {
-    [key: string]: SecretHitler
+    [key: string]: Game
 }
 
 type UserToRoomCode = {
@@ -88,6 +88,10 @@ export class SocketGames {
     public On(eventName: string, socket: Socket, callback: OnEventCallback) {
         socket.on(eventName, () => {
             const game = this.roomCodeToGame[this.userToRoomCode[socket.id]]
+            if (!game) {
+                socket.emit('error', 'You are not in a room.')
+                return
+            }
             callback({ game })
         })
     }

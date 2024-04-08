@@ -1,5 +1,6 @@
 import { Socket, Server } from 'socket.io'
 import { SocketGames } from '../SocketGames'
+import { SecretHitler } from './secrethitler'
 
 export default function SecretHitlerSockets(io: Server, socket: Socket, socketGames: SocketGames) {
     socketGames.On('startGame', socket, ({ game }) => {
@@ -8,7 +9,7 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
             return
         }
 
-        game.inProgress = true
-        io.to(socket.id).emit('gameStarted')
+        (game as SecretHitler).startGame()
+        io.to(game.roomCode).emit('gameStarted')
     })
 }
