@@ -10,6 +10,12 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
         }
 
         (game as SecretHitler).startGame()
-        io.to(game.roomCode).emit('gameStarted')
+        socketGames.Broadcast('gameStarted', io, game)
+    })
+
+    socketGames.On('increment', socket, ({ game }) => {
+        (game as SecretHitler).increment()
+        const newCount = (game as SecretHitler).getCount()
+        io.to(game.host).emit('incremented', (game as SecretHitler).getCount())
     })
 }

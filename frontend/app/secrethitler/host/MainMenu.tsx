@@ -2,12 +2,12 @@ import React from 'react'
 import RainbowText from 'components/RainbowText'
 import CoolButton from 'components/CoolButton'
 import Link from 'next/link'
-import { UpdateGameState } from '../useGameState'
+import { UpdateHostGameState } from './useHostGameState'
 import { useEffect } from 'react'
 import server from '@/lib/server'
 
 type MainMenuProps = {
-    updateGameState: UpdateGameState
+    updateGameState: UpdateHostGameState
 }
 
 const MainMenu:React.FC<MainMenuProps> = ({ updateGameState }) => {

@@ -1,14 +1,14 @@
 'use client'
 import React, { useEffect, useState } from 'react'
-import { GameState, UpdateGameState } from '../useGameState'
+import { HostGameState, UpdateHostGameState } from './useHostGameState'
 import RainbowText from '@/app/components/RainbowText'
 import server from '@/lib/server'
 import { Player } from '@/lib/utils'
 import RainbowButton from '@/app/components/RainbowButton'
 
 type WaitingRoomProps = {
-    gameState: GameState
-    updateGameState: UpdateGameState
+    gameState: HostGameState
+    updateGameState: UpdateHostGameState
 }
 
 const WaitingRoom:React.FC<WaitingRoomProps> = ({ gameState, updateGameState }) => {
@@ -34,6 +34,7 @@ const WaitingRoom:React.FC<WaitingRoomProps> = ({ gameState, updateGameState }) 
 
     function handlePlay() {
         server.socket.emit('startGame')
+        setLoading(true)
     }
     
     return (

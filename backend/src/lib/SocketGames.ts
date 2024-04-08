@@ -67,6 +67,7 @@ export class SocketGames {
             return
         }
 
+        this.userToRoomCode[socket.id] = code
         game.addPlayer(socket.id, name)
         socket.join(code)
         
@@ -94,5 +95,12 @@ export class SocketGames {
             }
             callback({ game })
         })
+    }
+
+    public Broadcast(eventName: string, io: Server, game: Game, data?: any) {
+        io.to(game.host).emit(eventName, data)
+        for (const player of game.getPlayers()) {
+            io.to(player.socketId).emit(eventName, data)
+        }
     }
 }

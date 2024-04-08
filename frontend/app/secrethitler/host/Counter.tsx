@@ -1,6 +1,7 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import RainbowText from '@/app/components/RainbowText'
+import server from '@/lib/server'
 
 type CounterProps = {
     
@@ -9,6 +10,16 @@ type CounterProps = {
 const Counter:React.FC<CounterProps> = () => {
 
     const [count, setCount] = useState(0)
+
+    useEffect(() => {
+        server.socket.on('incremented', (count: number) => {
+            setCount(count)
+        })
+
+        return () => {
+            server.socket.off('incremented')
+        }
+    }, [])
     
     return (
         <div className='w-full h-screen grid place-items-center'>

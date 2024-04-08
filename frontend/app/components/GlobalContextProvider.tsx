@@ -1,6 +1,6 @@
 'use client'
-import { GameType } from '@/lib/server'
 import { ReactNode, createContext, useContext, useState } from 'react'
+import { GameType } from '@/lib/utils'
 
 interface GlobalStateType {
     currentGame: GameType
