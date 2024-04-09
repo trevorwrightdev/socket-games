@@ -8,7 +8,7 @@ type LoadingProps = {
 const Loading:React.FC<LoadingProps> = () => {
     
     return (
-        <div className='w-full h-screen grid place-items-center'>
+        <div className='flex flex-col items-center'>
             <Spinner />
         </div>
     )

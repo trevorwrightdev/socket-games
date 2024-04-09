@@ -1,14 +1,17 @@
 import { useState, useEffect } from 'react'
+import server from '@/lib/server'
+
 export type Page = 'Main Menu' | 'How to Play' | 'Loading' | 'Waiting Room' | 'Counter'
 
 export type UpdateHostGameState = (newState: Partial<HostGameState>) => void
 
 export interface HostGameState {
     page: Page
-    roomCode?: string
+    roomCode: string
+    error: string
 }
 
-const defaultGameState: HostGameState = { page: 'Main Menu' }
+const defaultGameState: HostGameState = { page: 'Main Menu', roomCode: '', error: '' }
 
 export function useHostGameState(): { hostGameState: HostGameState; updateHostGameState: UpdateHostGameState, fade: boolean, currentPage: Page } {
     const [hostGameState, setHostGameState] = useState<HostGameState>(defaultGameState)
@@ -29,6 +32,16 @@ export function useHostGameState(): { hostGameState: HostGameState; updateHostGa
             setFade(false)
         }, 250)
     }, [hostGameState.page])
+
+    useEffect(() => {
+        server.socket.on('error', (error: string) => {
+            updateHostGameState({ error })
+        })
+
+        return () => {
+            server.socket.off('error')
+        }
+    }, [hostGameState])
 
     return {
         hostGameState,

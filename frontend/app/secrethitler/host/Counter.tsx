@@ -22,7 +22,7 @@ const Counter:React.FC<CounterProps> = () => {
     }, [])
     
     return (
-        <div className='w-full h-screen grid place-items-center'>
+        <div className='flex flex-col items-center'>
             <RainbowText className='font-bold text-3xl'>{count}</RainbowText>
         </div>  
     )

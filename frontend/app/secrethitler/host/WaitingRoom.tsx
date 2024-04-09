@@ -7,11 +7,11 @@ import { Player } from '@/lib/utils'
 import RainbowButton from '@/app/components/RainbowButton'
 
 type WaitingRoomProps = {
-    gameState: HostGameState
-    updateGameState: UpdateHostGameState
+    hostGameState: HostGameState
+    updateHostGameState: UpdateHostGameState
 }
 
-const WaitingRoom:React.FC<WaitingRoomProps> = ({ gameState, updateGameState }) => {
+const WaitingRoom:React.FC<WaitingRoomProps> = ({ hostGameState, updateHostGameState }) => {
 
     const [players, setPlayers] = useState<Player[]>([])
     const [loading, setLoading] = useState(false)
@@ -23,14 +23,14 @@ const WaitingRoom:React.FC<WaitingRoomProps> = ({ gameState, updateGameState }) 
             setPlayers(players)
         })
         server.socket.on('gameStarted', () => {
-            updateGameState({ page: 'Counter' })
+            updateHostGameState({ page: 'Counter' })
         })
 
         return () => {
             server.socket.off('playerJoined')
             server.socket.off('gameStarted')
         }
-    }, [])
+    }, [hostGameState])
 
     function handlePlay() {
         server.socket.emit('startGame')
@@ -38,9 +38,9 @@ const WaitingRoom:React.FC<WaitingRoomProps> = ({ gameState, updateGameState }) 
     }
     
     return (
-        <div className='w-full h-screen grid place-items-center'>
-            <div className='grid place-items-center gap-4'>
-                <h1 className='text-3xl font-bold'>Room Code: <RainbowText>{gameState.roomCode}</RainbowText></h1>
+            <div className='flex flex-col items-center gap-4'>
+                <h1 className='text-3xl font-bold'>Room Code: <RainbowText>{hostGameState.roomCode}</RainbowText></h1>
+                <p>At least 5 players must join to begin Secret Hitler.</p>
                 <div className='flex flex-col items-center'>
                     <p className='font-bold text-xl mb-2 underline'>Players</p>
                     {/* TODO: List players here */}
@@ -50,7 +50,6 @@ const WaitingRoom:React.FC<WaitingRoomProps> = ({ gameState, updateGameState }) 
                     <RainbowButton disabled={players.length === 0} loading={loading} onClick={handlePlay}>PLAY</RainbowButton>
                 </div>
             </div>
-        </div>
     )
 }
 

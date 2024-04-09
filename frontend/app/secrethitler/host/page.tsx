@@ -12,21 +12,26 @@ export default function SecretHitlerHostPage() {
 
   return (
     <FadeContainer fade={fade}>
-        {currentPage === 'Main Menu' && (
-            <MainMenu updateGameState={updateHostGameState}/>
-        )}
-        {currentPage === 'How to Play' && (
-            <div className='grid place-items-center w-full h-screen'>nice</div>
-        )}
-        {currentPage === 'Loading' && (
-            <Loading />
-        )}
-        {currentPage === 'Waiting Room' && (
-            <WaitingRoom gameState={hostGameState} updateGameState={updateHostGameState}/>
-        )}
-        {currentPage === 'Counter' && (
-            <Counter />
-        )}
+        <div className='w-full h-screen grid place-items-center'>
+            <div className='flex flex-col items-center'>
+                {currentPage === 'Main Menu' && (
+                <MainMenu updateHostGameState={updateHostGameState} hostGameState={hostGameState}/>
+                )}
+                {currentPage === 'How to Play' && (
+                    <div className='grid place-items-center w-full h-screen'>nice</div>
+                )}
+                {currentPage === 'Loading' && (
+                    <Loading />
+                )}
+                {currentPage === 'Waiting Room' && (
+                    <WaitingRoom hostGameState={hostGameState} updateHostGameState={updateHostGameState}/>
+                )}
+                {currentPage === 'Counter' && (
+                    <Counter />
+                )}
+                <p className='text-red-500'>{hostGameState.error}</p>
+            </div>
+        </div>
     </FadeContainer>
   )
 }

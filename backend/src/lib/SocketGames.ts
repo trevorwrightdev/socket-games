@@ -90,7 +90,7 @@ export class SocketGames {
         socket.on(eventName, () => {
             const game = this.roomCodeToGame[this.userToRoomCode[socket.id]]
             if (!game) {
-                socket.emit('error', 'You are not in a room.')
+                socket.emit('error', 'You are not in this room, or this room does not exist.')
                 return
             }
             callback({ game })

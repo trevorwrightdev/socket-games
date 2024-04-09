@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import server from '@/lib/server'
 
 export type Page = 'Waiting'| 'Counter'
 
@@ -6,9 +7,10 @@ export type UpdatePlayGameState = (newState: Partial<PlayGameState>) => void
 
 export interface PlayGameState {
     page: Page
+    error: string
 }
 
-const defaultGameState: PlayGameState = { page: 'Waiting' }
+const defaultGameState: PlayGameState = { page: 'Waiting', error: '' }
 
 export function usePlayGameState(): { playGameState: PlayGameState; updatePlayGameState: UpdatePlayGameState, fade: boolean, currentPage: Page } {
     const [playGameState, setPlayGameState] = useState<PlayGameState>(defaultGameState)
@@ -27,8 +29,19 @@ export function usePlayGameState(): { playGameState: PlayGameState; updatePlayGa
         setTimeout(() => {
             setCurrentPage(playGameState.page)
             setFade(false)
-        }, 250);
+        }, 250)
+        console.log(playGameState.page)
     }, [playGameState.page])
+
+    useEffect(() => {
+        server.socket.on('error', (error: string) => {
+            updatePlayGameState({ error })
+        })
+
+        return () => {
+            server.socket.off('error')
+        }
+    }, [playGameState])
 
     return {
         playGameState,
