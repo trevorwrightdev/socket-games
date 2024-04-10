@@ -17,18 +17,13 @@ const WaitingRoom:React.FC<WaitingRoomProps> = ({ hostGameState, updateHostGameS
     const [loading, setLoading] = useState(false)
 
     useEffect(() => {
-
         // Sets the players state when a player joins
         server.socket.on('playerJoined', (players: Player[]) => {
             setPlayers(players)
         })
-        server.socket.on('gameStarted', () => {
-            updateHostGameState({ page: 'Counter' })
-        })
 
         return () => {
             server.socket.off('playerJoined')
-            server.socket.off('gameStarted')
         }
     }, [hostGameState])
 

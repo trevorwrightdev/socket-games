@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import server from '@/lib/server'
 
-export type Page = 'Main Menu' | 'How to Play' | 'Loading' | 'Waiting Room' | 'Counter'
+export type Page = 'Main Menu' | 'How to Play' | 'Loading' | 'Waiting Room' 
 
 export type UpdateHostGameState = (newState: Partial<HostGameState>) => void
 
