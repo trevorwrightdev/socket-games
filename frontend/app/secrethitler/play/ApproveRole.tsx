@@ -25,7 +25,7 @@ const ApproveRole:React.FC<ApproveRoleProps> = ({ roleData }) => {
             )}
             {roleData.otherFascists && roleData.otherFascists.length > 0 && (
                 <div className='flex flex-col items-center'>
-                    <p>Your fellow fascists are:</p>
+                    <p>The other fascists are:</p>
                     {roleData.otherFascists.map((fascistName: any) => (
                         <p>
                             {fascistName}

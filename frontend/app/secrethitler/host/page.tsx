@@ -16,9 +16,6 @@ export default function SecretHitlerHostPage() {
                 {currentPage === 'Main Menu' && (
                     <MainMenu updateHostGameState={updateHostGameState} hostGameState={hostGameState}/>
                 )}
-                {currentPage === 'How to Play' && (
-                    <div className='grid place-items-center w-full h-screen'>nice</div>
-                )}
                 {currentPage === 'Waiting Room' && (
                     <WaitingRoom hostGameState={hostGameState} updateHostGameState={updateHostGameState}/>
                 )}

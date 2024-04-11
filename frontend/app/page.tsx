@@ -9,6 +9,7 @@ import { useGlobalState } from './components/GlobalContextProvider'
 import { useRouter } from 'next/navigation'
 import { GameType } from '@/lib/utils'
 import RainbowButton from './components/RainbowButton'
+import names from '@/lib/names.json'
 
 const links = [
     { title: 'Secret Hitler', href: '/secrethitler/host' },
@@ -41,7 +42,15 @@ export default function Home() {
     }
 
     function handleJoinGame() {
-        server.joinRoom(code, name)
+        let nameToUse = name
+        if (!nameToUse && process.env.NEXT_PUBLIC_DEV_MODE) {
+            do {
+                nameToUse = names[Math.floor(Math.random() * names.length)].toUpperCase()
+            } while (nameToUse.length > 10)
+            setName(nameToUse)
+        }
+
+        server.joinRoom(code, nameToUse)
         setLoading(true)
     }
 
@@ -76,7 +85,7 @@ export default function Home() {
             <h3>NAME</h3>
             <Input placeholder='enter your name' maxLength={10} value={name} onChange={(e) => setName(e.target.value)}/>
         </div>
-        <RainbowButton disabled={!codeValid || !name} loading={loading} onClick={handleJoinGame}>PLAY</RainbowButton>
+        <RainbowButton disabled={!codeValid || (!name && !process.env.NEXT_PUBLIC_DEV_MODE)} loading={loading} onClick={handleJoinGame}>PLAY</RainbowButton>
         <p className='text-red-500'>{error}</p>
         <h3 className='text-center mb-4 font-bold mt-4'>host a game</h3>
         <div>
