@@ -21,6 +21,9 @@ const WaitingRoom:React.FC<WaitingRoomProps> = ({ hostGameState, updateHostGameS
         server.socket.on('playerJoined', (players: Player[]) => {
             setPlayers(players)
         })
+        server.socket.on('gameStarted', () => {
+            updateHostGameState({ page: 'Countdown' })
+        })
 
         return () => {
             server.socket.off('playerJoined')
@@ -42,7 +45,7 @@ const WaitingRoom:React.FC<WaitingRoomProps> = ({ hostGameState, updateHostGameS
                     {players.map((player, index) => (
                         <div key={index} className='text-xl'>{player.name}</div>
                     ))}
-                    <RainbowButton disabled={players.length === 0} loading={loading} onClick={handlePlay}>PLAY</RainbowButton>
+                    <RainbowButton disabled={players.length < 5} loading={loading} onClick={handlePlay}>PLAY</RainbowButton>
                 </div>
             </div>
     )

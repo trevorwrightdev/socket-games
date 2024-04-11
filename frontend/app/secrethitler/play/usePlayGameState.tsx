@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import server from '@/lib/server'
 
-export type Page = 'Waiting'
+export type Page = 'Waiting' | 'ApproveRole'
 
 export type UpdatePlayGameState = (newState: Partial<PlayGameState>) => void
 

@@ -2,8 +2,8 @@
 import MainMenu from './MainMenu'
 import { useHostGameState } from './useHostGameState'
 import FadeContainer from 'components/FadeContainer'
-import Loading from './Loading'
 import WaitingRoom from './WaitingRoom'
+import Countdown from './Countdown'
 
 export default function SecretHitlerHostPage() {
 
@@ -19,11 +19,11 @@ export default function SecretHitlerHostPage() {
                 {currentPage === 'How to Play' && (
                     <div className='grid place-items-center w-full h-screen'>nice</div>
                 )}
-                {currentPage === 'Loading' && (
-                    <Loading />
-                )}
                 {currentPage === 'Waiting Room' && (
                     <WaitingRoom hostGameState={hostGameState} updateHostGameState={updateHostGameState}/>
+                )}
+                {currentPage === 'Countdown' && (
+                    <Countdown hostGameState={hostGameState} updateHostGameState={updateHostGameState}/>
                 )}
                 <p className='text-red-500'>{hostGameState.error}</p>
             </div>

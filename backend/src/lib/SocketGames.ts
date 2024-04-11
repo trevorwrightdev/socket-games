@@ -57,7 +57,12 @@ export class SocketGames {
 
         const game = this.roomCodeToGame[code]
 
-        if (game.getPlayers().length >= game.maxPlayers) {
+        if (game.players.find(player => player.name === name)) {
+            socket.emit('error', 'Name is already taken.')
+            return
+        }
+
+        if (game.players.length >= game.maxPlayers) {
             socket.emit('error', 'Room is full.')
             return
         }
@@ -79,7 +84,7 @@ export class SocketGames {
             name,
             roomCode: code,
         })
-        io.to(game.host).emit('playerJoined', game.getPlayers())
+        io.to(game.host).emit('playerJoined', game.players)
     }
 
     public codeIsValid(code: string): boolean {
@@ -99,7 +104,7 @@ export class SocketGames {
 
     public Broadcast(eventName: string, io: Server, game: Game, data?: any) {
         io.to(game.host).emit(eventName, data)
-        for (const player of game.getPlayers()) {
+        for (const player of game.players) {
             io.to(player.socketId).emit(eventName, data)
         }
     }
