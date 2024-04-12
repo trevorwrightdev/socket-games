@@ -13,22 +13,7 @@ type WaitingRoomProps = {
 
 const WaitingRoom:React.FC<WaitingRoomProps> = ({ hostGameState, updateHostGameState }) => {
 
-    const [players, setPlayers] = useState<Player[]>([])
     const [loading, setLoading] = useState(false)
-
-    useEffect(() => {
-        // Sets the players state when a player joins
-        server.socket.on('playerJoined', (players: Player[]) => {
-            setPlayers(players)
-        })
-        server.socket.on('gameStarted', () => {
-            updateHostGameState({ page: 'Countdown' })
-        })
-
-        return () => {
-            server.socket.off('playerJoined')
-        }
-    }, [hostGameState])
 
     function handlePlay() {
         server.socket.emit('startGame')
@@ -42,10 +27,10 @@ const WaitingRoom:React.FC<WaitingRoomProps> = ({ hostGameState, updateHostGameS
                 <div className='flex flex-col items-center'>
                     <p className='font-bold text-xl mb-2 underline'>Players</p>
                     {/* TODO: List players here */}
-                    {players.map((player, index) => (
+                    {hostGameState.players.map((player, index) => (
                         <div key={index} className='text-xl'>{player.name}</div>
                     ))}
-                    <RainbowButton disabled={players.length < 5} loading={loading} onClick={handlePlay}>PLAY</RainbowButton>
+                    <RainbowButton disabled={hostGameState.players.length < 5} loading={loading} onClick={handlePlay}>PLAY</RainbowButton>
                 </div>
             </div>
     )

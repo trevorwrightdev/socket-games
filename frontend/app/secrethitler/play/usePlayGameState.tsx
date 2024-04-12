@@ -8,6 +8,7 @@ export type UpdatePlayGameState = (newState: Partial<PlayGameState>) => void
 export interface PlayGameState {
     page: Page
     error: string
+    roleData?: any
 }
 
 const defaultGameState: PlayGameState = { page: 'Waiting', error: '' }
@@ -37,9 +38,13 @@ export function usePlayGameState(): { playGameState: PlayGameState; updatePlayGa
         server.socket.on('error', (error: string) => {
             updatePlayGameState({ error })
         })
+        server.socket.on('role', (roleData: any) => {
+            updatePlayGameState({ page: 'ApproveRole', roleData })
+        })
 
         return () => {
             server.socket.off('error')
+            server.socket.off('role')
         }
     }, [playGameState])
 

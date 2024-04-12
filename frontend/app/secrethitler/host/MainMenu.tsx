@@ -15,16 +15,6 @@ const MainMenu:React.FC<MainMenuProps> = ({ updateHostGameState, hostGameState }
 
     const [buttonDisabled, setButtonDisabled] = useState<boolean>(false)
 
-    useEffect(() => {
-        server.socket.on('roomCreated', (roomCode: string) => {
-            updateHostGameState({ page: 'Waiting Room', roomCode })
-        })
-
-        return () => {
-            server.socket.off('roomCreated')
-        }
-    }, [hostGameState])
-
     function handleStartGame() {
         // this is to prevent spam requests to come in
         server.createRoom('Secret Hitler')

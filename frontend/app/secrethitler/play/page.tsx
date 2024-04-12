@@ -10,19 +10,7 @@ import { useGlobalState } from '@/app/components/GlobalContextProvider'
 export default function Play() {
 
     const { playGameState, currentPage, updatePlayGameState, fade } = usePlayGameState()
-    const [roleData, setRoleData] = useState<any>(null)
     const [globalState] = useGlobalState()
-
-    useEffect(() => {
-        server.socket.on('role', (roleData: any) => {
-            updatePlayGameState({ page: 'ApproveRole' })
-            setRoleData(roleData)
-        })
-
-        return () => {
-            server.socket.off('role')
-        }
-    }, [])
 
     return (
         <div className='flex flex-col items-center'>
@@ -33,7 +21,7 @@ export default function Play() {
             <FadeContainer fade={fade}>
                 <div className='pt-2'>
                     {currentPage === 'ApproveRole' && (
-                        <ApproveRole roleData={roleData}/>
+                        <ApproveRole roleData={playGameState.roleData}/>
                     )}
                 </div>
             </FadeContainer>
