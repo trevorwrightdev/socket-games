@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import server from '@/lib/server'
 import { Player } from '@/lib/utils'
 
-export type Page = 'Main Menu' | 'How to Play' | 'Waiting Room' | 'Countdown'
+export type Page = 'Main Menu' | 'How to Play' | 'Waiting Room' | 'Countdown' | 'Game Board'
 
 export type UpdateHostGameState = (newState: Partial<HostGameState>) => void
 
@@ -13,7 +13,7 @@ export interface HostGameState {
     players: Player[]
 }
 
-const defaultGameState: HostGameState = { page: 'Main Menu', roomCode: '', error: '', players: [] }
+const defaultGameState: HostGameState = { page: 'Game Board', roomCode: '', error: '', players: [] }
 
 export function useHostGameState(): { hostGameState: HostGameState; updateHostGameState: UpdateHostGameState, fade: boolean, currentPage: Page } {
     const [hostGameState, setHostGameState] = useState<HostGameState>(defaultGameState)

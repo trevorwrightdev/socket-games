@@ -1,10 +1,19 @@
-import React from 'react'
+import React, { useEffect } from 'react'
+import server from '@/lib/server'
+import RainbowButton from '@/app/components/RainbowButton'
+import { UpdatePlayGameState } from './usePlayGameState'
 
 type ApproveRoleProps = {
     roleData: any
+    updatePlayGameState: UpdatePlayGameState
 }
 
-const ApproveRole:React.FC<ApproveRoleProps> = ({ roleData }) => {
+const ApproveRole:React.FC<ApproveRoleProps> = ({ roleData, updatePlayGameState }) => {
+
+    function handleApproval() {
+        server.socket.emit('approveRole')
+        updatePlayGameState({ page: 'Waiting' })
+    }
     
     return (
         <div className='flex flex-col items-center'>
@@ -33,6 +42,7 @@ const ApproveRole:React.FC<ApproveRoleProps> = ({ roleData }) => {
                     ))}
                 </div>
             )}
+            <RainbowButton onClick={handleApproval}>APPROVE</RainbowButton>
         </div>
     )
 }

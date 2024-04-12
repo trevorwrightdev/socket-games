@@ -16,6 +16,7 @@ export class SecretHitler extends Game {
         'liberals': [],
         'fascists': []
     }
+    public roleApprovalCount: number = 0
 
     public startGame() {
         this.inProgress = true

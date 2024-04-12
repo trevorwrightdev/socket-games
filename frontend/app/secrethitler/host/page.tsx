@@ -4,6 +4,7 @@ import { useHostGameState } from './useHostGameState'
 import FadeContainer from 'components/FadeContainer'
 import WaitingRoom from './WaitingRoom'
 import Countdown from './Countdown'
+import GameBoard from './GameBoard/GameBoard'
 
 export default function SecretHitlerHostPage() {
 
@@ -21,6 +22,9 @@ export default function SecretHitlerHostPage() {
                 )}
                 {currentPage === 'Countdown' && (
                     <Countdown hostGameState={hostGameState} updateHostGameState={updateHostGameState}/>
+                )}
+                {currentPage === 'Game Board' && (
+                    <GameBoard />
                 )}
                 <p className='text-red-500'>{hostGameState.error}</p>
             </div>

@@ -1,8 +1,6 @@
 'use client'
 import RainbowText from '@/app/components/RainbowText'
 import { usePlayGameState } from './usePlayGameState'
-import server from '@/lib/server'
-import { useEffect, useState } from 'react'
 import FadeContainer from '@/app/components/FadeContainer'
 import ApproveRole from './ApproveRole'
 import { useGlobalState } from '@/app/components/GlobalContextProvider'
@@ -21,7 +19,7 @@ export default function Play() {
             <FadeContainer fade={fade}>
                 <div className='pt-2'>
                     {currentPage === 'ApproveRole' && (
-                        <ApproveRole roleData={playGameState.roleData}/>
+                        <ApproveRole roleData={playGameState.roleData} updatePlayGameState={updatePlayGameState}/>
                     )}
                 </div>
             </FadeContainer>

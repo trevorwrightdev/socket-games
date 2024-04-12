@@ -31,7 +31,6 @@ export function usePlayGameState(): { playGameState: PlayGameState; updatePlayGa
             setCurrentPage(playGameState.page)
             setFade(false)
         }, 250)
-        console.log(playGameState.page)
     }, [playGameState.page])
 
     useEffect(() => {

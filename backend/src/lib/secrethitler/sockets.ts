@@ -42,4 +42,13 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
             })
         }
     })
+
+    socketGames.On('approveRole', socket, ({ game }) => {
+        const currentGame = game as SecretHitler
+        currentGame.roleApprovalCount++
+
+        if (currentGame.roleApprovalCount === currentGame.players.length) {
+            io.to(currentGame.host).emit('allRolesApproved')
+        }
+    })
 }
