@@ -28,7 +28,7 @@ export default function Play() {
         <div className='flex flex-col items-center'>
             <div className='bg-white w-full h-12 grid place-items-center'>
                 <RainbowText className='text-xl font-bold'>Secret Hitler</RainbowText>
-                {globalState.name}
+                {process.env.NEXT_PUBLIC_DEV_MODE && <p>{globalState.name}</p>}
             </div>
             <FadeContainer fade={fade}>
                 <div className='pt-2'>
