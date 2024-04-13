@@ -12,7 +12,7 @@ type UserToRoomCode = {
     [key: string]: string
 }
 
-type OnEventCallback = (args: { game: Game }) => void
+type OnEventCallback = (args: { game: Game, data?: any }) => void
 
 export class SocketGames {
     public roomCodeToGame: RoomCodeToGame = {}
@@ -92,13 +92,13 @@ export class SocketGames {
     }
 
     public On(eventName: string, socket: Socket, callback: OnEventCallback) {
-        socket.on(eventName, () => {
+        socket.on(eventName, (data: any) => {
             const game = this.roomCodeToGame[this.userToRoomCode[socket.id]]
             if (!game) {
                 socket.emit('error', 'You are not in this room, or this room does not exist.')
                 return
             }
-            callback({ game })
+            callback({ game, data })
         })
     }
 

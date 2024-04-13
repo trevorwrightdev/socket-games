@@ -4,6 +4,7 @@ import { usePlayGameState } from './usePlayGameState'
 import FadeContainer from '@/app/components/FadeContainer'
 import ApproveRole from './ApproveRole'
 import { useGlobalState } from '@/app/components/GlobalContextProvider'
+import ChooseChancellor from './ChooseChancellor'
 
 export default function Play() {
 
@@ -20,6 +21,9 @@ export default function Play() {
                 <div className='pt-2'>
                     {currentPage === 'ApproveRole' && (
                         <ApproveRole roleData={playGameState.roleData} updatePlayGameState={updatePlayGameState}/>
+                    )}
+                    {currentPage === 'Choose Chancellor' && (
+                        <ChooseChancellor playGameState={playGameState} updatePlayGameState={updatePlayGameState}/>
                     )}
                 </div>
             </FadeContainer>

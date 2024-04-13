@@ -85,7 +85,7 @@ export default function Home() {
             <h3>NAME</h3>
             <Input placeholder='enter your name' maxLength={10} value={name} onChange={(e) => setName(e.target.value)}/>
         </div>
-        <RainbowButton disabled={!codeValid || (!name && !process.env.NEXT_PUBLIC_DEV_MODE)} loading={loading} onClick={handleJoinGame}>PLAY</RainbowButton>
+        <RainbowButton disabled={!codeValid || (!name && !process.env.NEXT_PUBLIC_DEV_MODE)} loading={loading} onClick={handleJoinGame} className='mt-4'>PLAY</RainbowButton>
         <p className='text-red-500'>{error}</p>
         <h3 className='text-center mb-4 font-bold mt-4'>host a game</h3>
         <div>

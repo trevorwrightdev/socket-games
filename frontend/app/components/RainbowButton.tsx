@@ -5,11 +5,12 @@ type RainbowButtonProps = {
     onClick?: () => void
     disabled?: boolean
     loading?: boolean
+    className?: string
 }
 
-const RainbowButton:React.FC<RainbowButtonProps> = ({ children, onClick, disabled, loading }) => {
+const RainbowButton:React.FC<RainbowButtonProps> = ({ children, onClick, disabled, loading, className }) => {
     
-    return <button className={`${!disabled ? 'bg-rainbow-less text-white' : 'bg-white text-primary pointer-events-none'} ${loading ? 'pointer-events-none' : ''} w-20 rounded-md py-2 mt-4 mb-4`} onClick={onClick}>{children}</button>
+    return <button className={`${!disabled ? 'bg-rainbow-less text-white' : 'bg-white text-primary pointer-events-none'} ${loading ? 'pointer-events-none' : ''} rounded-md py-2 px-4 ${className}`} onClick={onClick}>{children}</button>
 }
 
 export default RainbowButton

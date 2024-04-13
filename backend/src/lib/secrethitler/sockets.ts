@@ -1,6 +1,7 @@
 import { Socket, Server } from 'socket.io'
 import { SocketGames } from '../SocketGames'
 import { SecretHitler } from './secrethitler'
+import { Player } from '../utils'
 
 export default function SecretHitlerSockets(io: Server, socket: Socket, socketGames: SocketGames) {
 
@@ -58,5 +59,11 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
             io.to(currentGame.host).emit('showGameBoard')
             beginRound(currentGame)
         }
+    })
+
+    socketGames.On('pickChancellor', socket, ({ game, data }) => {
+        const player = data as Player
+
+        console.log(player.name)
     })
 }
