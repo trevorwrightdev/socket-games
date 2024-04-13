@@ -108,4 +108,10 @@ export class SocketGames {
             io.to(player.socketId).emit(eventName, data)
         }
     }
+
+    public EmitToPlayers(eventName: string, io: Server, game: Game, data?: any) {
+        for (const player of game.players) {
+            io.to(player.socketId).emit(eventName, data)
+        }
+    }
 }
