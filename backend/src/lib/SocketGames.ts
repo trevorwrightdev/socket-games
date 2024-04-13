@@ -12,7 +12,7 @@ type UserToRoomCode = {
     [key: string]: string
 }
 
-type OnEventCallback = (args: { game: Game }) => void
+type OnEventCallback = (args: { game: Game, data?: any }) => void
 
 export class SocketGames {
     public roomCodeToGame: RoomCodeToGame = {}
@@ -57,7 +57,12 @@ export class SocketGames {
 
         const game = this.roomCodeToGame[code]
 
-        if (game.getPlayers().length >= game.maxPlayers) {
+        if (game.players.find(player => player.name === name)) {
+            socket.emit('error', 'Name is already taken.')
+            return
+        }
+
+        if (game.players.length >= game.maxPlayers) {
             socket.emit('error', 'Room is full.')
             return
         }
@@ -79,7 +84,7 @@ export class SocketGames {
             name,
             roomCode: code,
         })
-        io.to(game.host).emit('playerJoined', game.getPlayers())
+        io.to(game.host).emit('playerJoined', game.players)
     }
 
     public codeIsValid(code: string): boolean {
@@ -87,19 +92,25 @@ export class SocketGames {
     }
 
     public On(eventName: string, socket: Socket, callback: OnEventCallback) {
-        socket.on(eventName, () => {
+        socket.on(eventName, (data: any) => {
             const game = this.roomCodeToGame[this.userToRoomCode[socket.id]]
             if (!game) {
                 socket.emit('error', 'You are not in this room, or this room does not exist.')
                 return
             }
-            callback({ game })
+            callback({ game, data })
         })
     }
 
     public Broadcast(eventName: string, io: Server, game: Game, data?: any) {
         io.to(game.host).emit(eventName, data)
-        for (const player of game.getPlayers()) {
+        for (const player of game.players) {
+            io.to(player.socketId).emit(eventName, data)
+        }
+    }
+
+    public EmitToPlayers(eventName: string, io: Server, game: Game, data?: any) {
+        for (const player of game.players) {
             io.to(player.socketId).emit(eventName, data)
         }
     }

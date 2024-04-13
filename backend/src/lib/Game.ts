@@ -2,7 +2,7 @@ import { GameType, Player } from './utils'
 
 export default class Game {
     // key is socket id, value is player name
-    private players: Player[] = []
+    public players: Player[] = []
     private socketIds: Set<string> = new Set()
     public roomCode: string = ''
     public gameType: GameType = 'None'
@@ -17,9 +17,5 @@ export default class Game {
             name
         })
         this.socketIds.add(socketId)
-    }
-
-    public getPlayers() {
-        return this.players
     }
 }
