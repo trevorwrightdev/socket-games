@@ -24,8 +24,8 @@ export default function SecretHitlerHostPage() {
                     <Countdown hostGameState={hostGameState} updateHostGameState={updateHostGameState}/>
                 )}
                 {currentPage === 'Game Board' && (
-                    <GameBoard />
-                )}
+                    <GameBoard hostGameState={hostGameState}/>
+                )} 
                 <p className='text-red-500'>{hostGameState.error}</p>
             </div>
         </div>

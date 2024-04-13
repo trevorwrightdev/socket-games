@@ -42,7 +42,7 @@ const ApproveRole:React.FC<ApproveRoleProps> = ({ roleData, updatePlayGameState 
                     ))}
                 </div>
             )}
-            <RainbowButton onClick={handleApproval}>APPROVE</RainbowButton>
+            <RainbowButton onClick={handleApproval}>Got it!</RainbowButton>
         </div>
     )
 }

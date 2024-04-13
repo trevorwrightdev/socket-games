@@ -17,10 +17,19 @@ export class SecretHitler extends Game {
         'fascists': []
     }
     public roleApprovalCount: number = 0
+    public presidentIndex: number = -1
 
     public startGame() {
         this.inProgress = true
         this.assignRoles()
+    }
+
+    public getNextPresident() {
+        this.presidentIndex++
+        if (this.presidentIndex >= this.players.length) {
+            this.presidentIndex = 0
+        }
+        return this.players[this.presidentIndex]
     }
 
     public assignRoles() {
@@ -60,5 +69,9 @@ export class SecretHitler extends Game {
             [array[i], array[j]] = [array[j], array[i]];
         }
         return array;
+    }
+
+    public getEligibleChancellors(president: Player) {
+        return this.players.filter(p => p.socketId !== president.socketId)
     }
 }

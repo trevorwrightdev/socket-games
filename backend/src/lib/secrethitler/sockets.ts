@@ -43,12 +43,20 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
         }
     })
 
+    function beginRound(currentGame: SecretHitler) {
+        const president = currentGame.getNextPresident()
+        io.to(currentGame.host).emit('newPresident', `${president.name} is the president. ${president.name}, please choose your chancellor.`)
+        // TODO: make the get eligible chancellors function
+        io.to(president.socketId).emit('chooseChancellor', currentGame.getEligibleChancellors(president))
+    }
+
     socketGames.On('approveRole', socket, ({ game }) => {
         const currentGame = game as SecretHitler
         currentGame.roleApprovalCount++
 
         if (currentGame.roleApprovalCount === currentGame.players.length) {
-            io.to(currentGame.host).emit('allRolesApproved')
+            io.to(currentGame.host).emit('showGameBoard')
+            beginRound(currentGame)
         }
     })
 }

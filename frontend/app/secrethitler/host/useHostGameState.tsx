@@ -11,9 +11,10 @@ export interface HostGameState {
     roomCode: string
     error: string
     players: Player[]
+    message: string
 }
 
-const defaultGameState: HostGameState = { page: 'Game Board', roomCode: '', error: '', players: [] }
+const defaultGameState: HostGameState = { page: 'Main Menu', roomCode: '', error: '', players: [], message: '' }
 
 export function useHostGameState(): { hostGameState: HostGameState; updateHostGameState: UpdateHostGameState, fade: boolean, currentPage: Page } {
     const [hostGameState, setHostGameState] = useState<HostGameState>(defaultGameState)
@@ -48,12 +49,20 @@ export function useHostGameState(): { hostGameState: HostGameState; updateHostGa
         server.socket.on('gameStarted', () => {
             updateHostGameState({ page: 'Countdown' })
         })
+        server.socket.on('showGameBoard', () => {
+            updateHostGameState({ page: 'Game Board' })
+        })
+        server.socket.on('newPresident', (message: string) => {
+            updateHostGameState({ message })
+        })
 
         return () => {
             server.socket.off('error')
             server.socket.off('roomCreated')
             server.socket.off('playerJoined')
             server.socket.off('gameStarted')
+            server.socket.off('showGameBoard')
+            server.socket.off('newPresident')
         }
     }, [hostGameState])
 
