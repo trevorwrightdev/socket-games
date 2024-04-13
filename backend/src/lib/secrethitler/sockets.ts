@@ -47,7 +47,6 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
     function beginRound(currentGame: SecretHitler) {
         const president = currentGame.getNextPresident()
         io.to(currentGame.host).emit('newPresident', `${president.name} is the president. ${president.name}, please choose your chancellor.`)
-        // TODO: make the get eligible chancellors function
         io.to(president.socketId).emit('chooseChancellor', currentGame.getEligibleChancellors(president))
     }
 
@@ -63,8 +62,6 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
 
     socketGames.On('pickChancellor', socket, ({ game, data }) => {
         const player = data as Player
-        const currentGame = game as SecretHitler
-        currentGame.pickChancellor(player)
 
         // emit to everyone a chancellor has been picked
         socketGames.Broadcast('chancellorPicked', io, game, player)

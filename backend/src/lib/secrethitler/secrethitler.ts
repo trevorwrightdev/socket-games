@@ -43,10 +43,6 @@ export class SecretHitler extends Game {
         return this.livingPlayers[this.presidentIndex]
     }
 
-    public pickChancellor(chancellor: Player) {
-        this.lastChancellor = chancellor
-    }
-
     public assignRoles() {
         let fascistCount = 2
         if (this.players.length === 5 || this.players.length === 6) {
