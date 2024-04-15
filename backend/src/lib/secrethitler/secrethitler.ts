@@ -18,6 +18,8 @@ export class SecretHitler extends Game {
     }
     public roleApprovalCount: number = 0
     public presidentIndex: number = -1
+    public runningPresident: Player = {} as Player
+    public runningChancellor: Player = {} as Player
     public lastPresident: Player = {} as Player
     public lastChancellor: Player = {} as Player
     public yesVotes: number = 0
@@ -29,11 +31,6 @@ export class SecretHitler extends Game {
     }
 
     public getNextPresident() {
-        if (this.presidentIndex !== -1) {
-            // the current president becomes the last president
-            this.lastPresident = this.players[this.presidentIndex]
-        }
-
         // now, we have a new current president
         this.presidentIndex++
         if (this.presidentIndex >= this.players.length) {

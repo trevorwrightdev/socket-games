@@ -10,12 +10,25 @@ type GameBoardProps = {
 
 const GameBoard:React.FC<GameBoardProps> = ({ hostGameState }) => {
     
+    const getMessageColorClass = (color: string) => {
+        switch(color) {
+            case 'black':
+                return 'text-black'; // Default text color in Tailwind
+            case 'red':
+                return 'text-red-500'; // Red text color
+            case 'green':
+                return 'text-green-500'; // Green text color
+            default:
+                return 'text-black'; // Fallback color
+        }
+    }
+
     return (
         <div className='flex flex-col items-center'>
             <FascistBoard />
             <LiberalBoard />
             <p className='font-bold'>-------------------------------------------------------------</p>
-            <p className='text-xl mb-2'>{hostGameState.message}</p>
+            <p className={`text-xl mb-2 ${getMessageColorClass(hostGameState.messageColor)}`}>{hostGameState.message}</p>
             <VoteDisplay hostGameState={hostGameState}/>
         </div>
     )

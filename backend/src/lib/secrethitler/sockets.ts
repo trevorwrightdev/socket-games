@@ -46,9 +46,15 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
 
     function beginRound(currentGame: SecretHitler) {
         const president = currentGame.getNextPresident()
+        currentGame.runningPresident = president
         io.to(currentGame.host).emit('newPresident', `${president.name} is the president. ${president.name}, please choose your chancellor.`)
         io.to(president.socketId).emit('chooseChancellor', currentGame.getEligibleChancellors(president))
     }
+
+    socketGames.On('beginRound', socket, ({ game }) => {
+        const currentGame = game as SecretHitler
+        beginRound(currentGame)
+    })
 
     socketGames.On('approveRole', socket, ({ game }) => {
         const currentGame = game as SecretHitler
@@ -63,6 +69,7 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
     socketGames.On('pickChancellor', socket, ({ game, data }) => {
         const currentGame = game as SecretHitler
         const player = data as Player
+        currentGame.runningChancellor = player
 
         // emit to everyone a chancellor has been picked
         socketGames.Broadcast('chancellorPicked', io, currentGame, {
@@ -89,11 +96,15 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
             if (currentGame.yesVotes > currentGame.noVotes) {
                 // emit to everyone that the vote passed
                 io.to(currentGame.host).emit('votePassed', 'The vote has passed. The president and chancellor will now enact a policy.')
+
+                // now we have successfully elected these players
+                currentGame.lastPresident = currentGame.runningPresident
+                currentGame.lastChancellor = currentGame.runningChancellor
             } else {
                 // emit to everyone that the vote failed
                 io.to(currentGame.host).emit('voteFailed', 'The vote has failed. The next president will now nominate a chancellor.')
-                beginRound(currentGame)
             }
+            // reset votes
             currentGame.yesVotes = 0
             currentGame.noVotes = 0
         }
