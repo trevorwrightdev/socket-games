@@ -20,8 +20,8 @@ export class SecretHitler extends Game {
     public presidentIndex: number = -1
     public runningPresident: Player = {} as Player
     public runningChancellor: Player = {} as Player
-    public lastPresident: Player = {} as Player
-    public lastChancellor: Player = {} as Player
+    public president: Player = {} as Player
+    public chancellor: Player = {} as Player
     public yesVotes: number = 0
     public noVotes: number = 0
 
@@ -80,11 +80,11 @@ export class SecretHitler extends Game {
 
     public getEligibleChancellors(president: Player) {
         // cannot be the current president or the last chancellor
-        let eligibleChancellors = this.players.filter(p => p.socketId !== president.socketId && p.socketId !== this.lastChancellor.socketId)
+        let eligibleChancellors = this.players.filter(p => p.socketId !== president.socketId && p.socketId !== this.chancellor.socketId)
 
         if (this.players.length > 5) {
             // if more than 5 players in the game, last president is ineligible
-            eligibleChancellors = eligibleChancellors.filter(p => p.socketId !== this.lastPresident.socketId)
+            eligibleChancellors = eligibleChancellors.filter(p => p.socketId !== this.president.socketId)
         }
 
         return eligibleChancellors

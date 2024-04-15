@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import server from '@/lib/server'
 import { Player } from '@/lib/utils'
 
@@ -14,9 +14,10 @@ export interface HostGameState {
     message: string
     messageColor: string
     votes: { vote: boolean, name: string }[]
+    showVoteBoard: boolean
 }
 
-const defaultGameState: HostGameState = { page: 'Main Menu', roomCode: '', error: '', players: [], message: '', messageColor: 'black', votes: []}
+const defaultGameState: HostGameState = { page: 'Main Menu', roomCode: '', error: '', players: [], message: '', messageColor: 'black', votes: [], showVoteBoard: false}
 
 export function useHostGameState(): { hostGameState: HostGameState; updateHostGameState: UpdateHostGameState, fade: boolean, currentPage: Page } {
     const [hostGameState, setHostGameState] = useState<HostGameState>(defaultGameState)
@@ -59,7 +60,7 @@ export function useHostGameState(): { hostGameState: HostGameState; updateHostGa
             updateHostGameState({ page: 'Game Board' })
         })
         server.socket.on('newPresident', (message: string) => {
-            setMessage(message)
+            updateHostGameState({ votes: [], showVoteBoard: false, message, messageColor: 'black'})
         })
         server.socket.on('chancellorPicked', ({ chancellor, president }: {chancellor: Player, president: Player}) => {
             setMessage(`${president.name} has nominated ${chancellor.name} as chancellor. Please vote to decide if these players should be elected.`)
@@ -68,17 +69,15 @@ export function useHostGameState(): { hostGameState: HostGameState; updateHostGa
             updateHostGameState({ votes: [...hostGameState.votes, voteData] })  
         })
         server.socket.on('votePassed', (message: string) => {
-            setMessage(message, 'green')
+            updateHostGameState({showVoteBoard: true, message, messageColor: 'green'})
         })
         server.socket.on('voteFailed', (message: string) => {
-            setMessage(message, 'red')
+            updateHostGameState({showVoteBoard: true, message, messageColor: 'red'})
 
             setTimeout(() => {
-                updateHostGameState({ votes: [] })
                 server.socket.emit('beginRound')
             }, 7000)
         })
-
 
         return () => {
             server.socket.off('error')

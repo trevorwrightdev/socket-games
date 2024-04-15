@@ -98,8 +98,8 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
                 io.to(currentGame.host).emit('votePassed', 'The vote has passed. The president and chancellor will now enact a policy.')
 
                 // now we have successfully elected these players
-                currentGame.lastPresident = currentGame.runningPresident
-                currentGame.lastChancellor = currentGame.runningChancellor
+                currentGame.president = currentGame.runningPresident
+                currentGame.chancellor = currentGame.runningChancellor
             } else {
                 // emit to everyone that the vote failed
                 io.to(currentGame.host).emit('voteFailed', 'The vote has failed. The next president will now nominate a chancellor.')

@@ -28,7 +28,7 @@ const GameBoard:React.FC<GameBoardProps> = ({ hostGameState }) => {
             <FascistBoard />
             <LiberalBoard />
             <p className='font-bold'>-------------------------------------------------------------</p>
-            <p className={`text-xl mb-2 ${getMessageColorClass(hostGameState.messageColor)}`}>{hostGameState.message}</p>
+            <p className={`text-xl mb-2 text-center ${getMessageColorClass(hostGameState.messageColor)}`}>{hostGameState.message}</p>
             <VoteDisplay hostGameState={hostGameState}/>
         </div>
     )
