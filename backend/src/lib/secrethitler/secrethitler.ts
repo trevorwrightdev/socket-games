@@ -21,26 +21,24 @@ export class SecretHitler extends Game {
     public lastPresident: Player = {} as Player
     public lastChancellor: Player = {} as Player
     // TODO: When players die, remove them from this list
-    public livingPlayers: Player[] = []
 
     public startGame() {
         this.inProgress = true
         this.assignRoles()
-        this.livingPlayers = this.players
     }
 
     public getNextPresident() {
         if (this.presidentIndex !== -1) {
             // the current president becomes the last president
-            this.lastPresident = this.livingPlayers[this.presidentIndex]
+            this.lastPresident = this.players[this.presidentIndex]
         }
 
         // now, we have a new current president
         this.presidentIndex++
-        if (this.presidentIndex >= this.livingPlayers.length) {
+        if (this.presidentIndex >= this.players.length) {
             this.presidentIndex = 0
         }
-        return this.livingPlayers[this.presidentIndex]
+        return this.players[this.presidentIndex]
     }
 
     public assignRoles() {
@@ -84,9 +82,9 @@ export class SecretHitler extends Game {
 
     public getEligibleChancellors(president: Player) {
         // cannot be the current president or the last chancellor
-        let eligibleChancellors = this.livingPlayers.filter(p => p.socketId !== president.socketId && p.socketId !== this.lastChancellor.socketId)
+        let eligibleChancellors = this.players.filter(p => p.socketId !== president.socketId && p.socketId !== this.lastChancellor.socketId)
 
-        if (this.livingPlayers.length <= 5) {
+        if (this.players.length <= 5) {
             // if only 5 players in the game, last president is also ineligible
             eligibleChancellors = eligibleChancellors.filter(p => p.socketId !== this.lastPresident.socketId)
         }

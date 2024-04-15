@@ -55,6 +55,9 @@ export function useHostGameState(): { hostGameState: HostGameState; updateHostGa
         server.socket.on('newPresident', (message: string) => {
             updateHostGameState({ message })
         })
+        server.socket.on('chancellorPicked', ({ chancellor, president }: {chancellor: Player, president: Player}) => {
+            updateHostGameState({ message: `${president.name} has nominated ${chancellor.name} as chancellor. Please vote to decide if these players should be elected.` })
+        })
 
         return () => {
             server.socket.off('error')
@@ -63,6 +66,7 @@ export function useHostGameState(): { hostGameState: HostGameState; updateHostGa
             server.socket.off('gameStarted')
             server.socket.off('showGameBoard')
             server.socket.off('newPresident')
+            server.socket.off('chancellorPicked')
         }
     }, [hostGameState])
 

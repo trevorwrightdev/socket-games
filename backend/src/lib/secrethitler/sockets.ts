@@ -61,9 +61,17 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
     })
 
     socketGames.On('pickChancellor', socket, ({ game, data }) => {
+        const currentGame = game as SecretHitler
         const player = data as Player
 
         // emit to everyone a chancellor has been picked
-        socketGames.Broadcast('chancellorPicked', io, game, player)
+        socketGames.Broadcast('chancellorPicked', io, currentGame, {
+            chancellor: player,
+            president: currentGame.players[currentGame.presidentIndex]
+        })
+    })
+
+    socketGames.On('vote', socket, ({ game, data }) => {
+        const currentGame = game as SecretHitler
     })
 }
