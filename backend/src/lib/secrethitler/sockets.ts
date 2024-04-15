@@ -73,5 +73,29 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
 
     socketGames.On('vote', socket, ({ game, data }) => {
         const currentGame = game as SecretHitler
+        const player = currentGame.players.find(p => p.socketId === socket.id)
+        io.to(currentGame.host).emit('vote', {
+            name: player?.name,
+            vote: data
+        })
+
+        if (data) {
+            currentGame.yesVotes++
+        } else {
+            currentGame.noVotes++
+        }
+
+        if (currentGame.yesVotes + currentGame.noVotes === currentGame.players.length) {
+            if (currentGame.yesVotes > currentGame.noVotes) {
+                // emit to everyone that the vote passed
+                io.to(currentGame.host).emit('votePassed', 'The vote has passed. The president and chancellor will now enact a policy.')
+            } else {
+                // emit to everyone that the vote failed
+                io.to(currentGame.host).emit('voteFailed', 'The vote has failed. The next president will now nominate a chancellor.')
+                beginRound(currentGame)
+            }
+            currentGame.yesVotes = 0
+            currentGame.noVotes = 0
+        }
     })
 }

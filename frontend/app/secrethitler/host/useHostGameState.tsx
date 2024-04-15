@@ -12,9 +12,10 @@ export interface HostGameState {
     error: string
     players: Player[]
     message: string
+    votes: { vote: boolean, name: string }[]
 }
 
-const defaultGameState: HostGameState = { page: 'Main Menu', roomCode: '', error: '', players: [], message: '' }
+const defaultGameState: HostGameState = { page: 'Main Menu', roomCode: '', error: '', players: [], message: '', votes: []}
 
 export function useHostGameState(): { hostGameState: HostGameState; updateHostGameState: UpdateHostGameState, fade: boolean, currentPage: Page } {
     const [hostGameState, setHostGameState] = useState<HostGameState>(defaultGameState)
@@ -58,6 +59,10 @@ export function useHostGameState(): { hostGameState: HostGameState; updateHostGa
         server.socket.on('chancellorPicked', ({ chancellor, president }: {chancellor: Player, president: Player}) => {
             updateHostGameState({ message: `${president.name} has nominated ${chancellor.name} as chancellor. Please vote to decide if these players should be elected.` })
         })
+        server.socket.on('vote', (voteData: { vote: boolean, name: string }) => {
+            updateHostGameState({ votes: [...hostGameState.votes, voteData] })  
+        })
+
 
         return () => {
             server.socket.off('error')
@@ -67,6 +72,7 @@ export function useHostGameState(): { hostGameState: HostGameState; updateHostGa
             server.socket.off('showGameBoard')
             server.socket.off('newPresident')
             server.socket.off('chancellorPicked')
+            server.socket.off('vote')
         }
     }, [hostGameState])
 
