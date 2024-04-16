@@ -123,6 +123,9 @@ export function useHostGameState(): { hostGameState: HostGameState; updateHostGa
                 setFailedElectionCount(0)
             }, 5000)
         })
+        server.socket.on('gameOver', (data) => {
+            updateHostGameState({ message: data.message, messageColor: data.winners === 'fascist' ? 'red' : 'blue'})
+        })
 
         return () => {
             server.socket.off('error')
@@ -139,6 +142,7 @@ export function useHostGameState(): { hostGameState: HostGameState; updateHostGa
             server.socket.off('chancellorPickPolicy')
             server.socket.off('newPolicyEnacted')
             server.socket.off('electionChaos')
+            server.socket.off('gameOver')
         }
     }, [hostGameState])
 

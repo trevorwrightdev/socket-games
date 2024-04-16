@@ -45,6 +45,12 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
     })
 
     function beginRound(currentGame: SecretHitler) {
+        const gameOverMessage = currentGame.getGameOverMessage()
+        if (gameOverMessage) {
+            io.to(currentGame.host).emit('gameOver', gameOverMessage)
+            return
+        }
+
         const president = currentGame.getNextPresident()
         currentGame.runningPresident = president
         io.to(currentGame.host).emit('newPresident', `${president.name} is the president. ${president.name}, please choose your chancellor.`)
@@ -95,12 +101,21 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
         if (currentGame.yesVotes + currentGame.noVotes === currentGame.players.length) {
             if (currentGame.yesVotes > currentGame.noVotes) {
                 currentGame.failedElectionCount = 0
-                // emit to everyone that the vote passed
-                io.to(currentGame.host).emit('votePassed', 'The vote has passed. The president and chancellor will now enact a policy.')
 
                 // now we have successfully elected these players
                 currentGame.president = currentGame.runningPresident
                 currentGame.chancellor = currentGame.runningChancellor
+
+                // Check for hitler election if 3 fascist policies
+                if (currentGame.fascistPolicyCount >= 3 && currentGame.chancellor.socketId === currentGame.roles.hitler.socketId) {
+                    io.to(currentGame.host).emit('gameOver', {
+                        message: `${currentGame.roles.hitler.name} was Hitler and 3 fascist policies have been enacted. Fascists win!`,
+                        winners: 'fascist'
+                    })
+                } else {
+                    // emit to everyone that the vote passed
+                    io.to(currentGame.host).emit('votePassed', 'The vote has passed. The president and chancellor will now enact a policy.')
+                }
             } else {
                 currentGame.failedElectionCount++
 

@@ -143,4 +143,25 @@ export class SecretHitler extends Game {
             this.liberalPolicyCount++
         }
     }
+
+    public getGameOverMessage() {
+        const hitlerAlive = this.players.some(p => p.socketId === this.roles.hitler.socketId)
+        if (this.liberalPolicyCount >= 6) {
+            return {
+                message: 'Liberals have enacted 6 policies. Liberals win!',
+                winners: 'liberal'
+            }
+        } else if (this.fascistPolicyCount >= 6) {
+            return {
+                message: 'Fascists have enacted 6 policies. Facscists win!',
+                winners: 'fascist'
+            }
+        } else if (hitlerAlive === false) {
+            return {
+                message: `${this.roles.hitler.name} was Hitler and has been killed. Liberals win!`,
+                winners: 'liberal'
+            }
+        }
+        return null
+    }
 }
