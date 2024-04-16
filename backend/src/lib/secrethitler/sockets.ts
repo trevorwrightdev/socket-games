@@ -115,7 +115,14 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
 
         // at this point, the president and chancellor have been elected, and they need to enact policies
         const policyOptions = currentGame.getThreePolicyCards()
-        io.to(currentGame.president.socketId).emit('pickPolicy', policyOptions)
-        io.to(currentGame.host).emit('pickPolicy', `${currentGame.president.name} is choosing a policy to discard.`)
+        io.to(currentGame.president.socketId).emit('presidentPickPolicy', policyOptions)
+        io.to(currentGame.host).emit('presidentPickPolicy', `President ${currentGame.president.name} is choosing a policy to discard.`)
+    })
+
+    socketGames.On('discardPolicy', socket, ({ game, data }) => {
+        const currentGame = game as SecretHitler
+
+        io.to(currentGame.host).emit('chancellorPickPolicy', `Chancellor ${currentGame.chancellor.name} is now choosing a policy to enact.`)
+        io.to(currentGame.chancellor.socketId).emit('chancellorPickPolicy', data)
     })
 }

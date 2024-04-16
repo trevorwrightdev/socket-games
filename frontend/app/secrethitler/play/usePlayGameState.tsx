@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import server from '@/lib/server'
 import { Player } from '@/lib/utils'
 
-export type Page = 'Waiting' | 'ApproveRole' | 'Choose Chancellor' | 'Vote' | 'Pick Policy as President'
+export type Page = 'Waiting' | 'ApproveRole' | 'Choose Chancellor' | 'Vote' | 'Pick Policy as President' | 'Pick Policy as Chancellor'
 
 export type UpdatePlayGameState = (newState: Partial<PlayGameState>) => void
 
@@ -51,8 +51,11 @@ export function usePlayGameState(): { playGameState: PlayGameState; updatePlayGa
         server.socket.on('chancellorPicked', ({ chancellor, president }: { chancellor: Player, president: Player }) => {
             updatePlayGameState({ page: 'Vote', president, chancellor})
         })
-        server.socket.on('pickPolicy', (policies: ('fascist' | 'liberal')[]) => {
+        server.socket.on('presidentPickPolicy', (policies: ('fascist' | 'liberal')[]) => {
             updatePlayGameState({ page: 'Pick Policy as President', policies })
+        })
+        server.socket.on('chancellorPickPolicy', (policies: ('fascist' | 'liberal')[]) => {
+            updatePlayGameState({ page: 'Pick Policy as Chancellor', policies })
         })
 
         return () => {
@@ -60,7 +63,8 @@ export function usePlayGameState(): { playGameState: PlayGameState; updatePlayGa
             server.socket.off('role')
             server.socket.off('chooseChancellor')
             server.socket.off('chancellorPicked')
-            server.socket.off('pickPolicy')
+            server.socket.off('presidentPickPolicy')
+            server.socket.off('chancellorPickPolicy')
         }
     }, [playGameState])
 

@@ -2,21 +2,20 @@ import React from 'react'
 import { PlayGameState, UpdatePlayGameState } from './usePlayGameState'
 import server from '@/lib/server'
 
-type PickPolicyAsPresidentProps = {
+type PickPolicyAsChancellorProps = {
     playGameState: PlayGameState
     updatePlayGameState: UpdatePlayGameState
 }
 
-const PickPolicyAsPresident:React.FC<PickPolicyAsPresidentProps> = ({ playGameState, updatePlayGameState }) => {
+const PickPolicyAsChancellor:React.FC<PickPolicyAsChancellorProps> = ({ playGameState, updatePlayGameState }) => {
     
     return (
         <div className='flex flex-col items-center gap-2'>
-            <h1>Choose a policy to <span className='font-bold italic'>discard</span> and <span className='font-bold italic'>not</span> enact.</h1>
+            <h1>Choose a policy to enact.</h1>
             {playGameState.policies.map((policy, index) => {
 
                 const handlePolicyDiscard = () => {
-                    const newPolicies = playGameState.policies.filter((_, i) => i !== index)
-                    server.socket.emit('discardPolicy', newPolicies)
+                    server.socket.emit('enactPolicy', policy)
                     updatePlayGameState({ page: 'Waiting' })
                 }
 
@@ -28,4 +27,4 @@ const PickPolicyAsPresident:React.FC<PickPolicyAsPresidentProps> = ({ playGameSt
     )
 }
 
-export default PickPolicyAsPresident
+export default PickPolicyAsChancellor

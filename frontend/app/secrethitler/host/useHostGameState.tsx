@@ -78,8 +78,11 @@ export function useHostGameState(): { hostGameState: HostGameState; updateHostGa
                 server.socket.emit('beginRound')
             }, 5000)
         })
-        server.socket.on('pickPolicy', (message: string) => {
+        server.socket.on('presidentPickPolicy', (message: string) => {
             updateHostGameState({ message, messageColor: 'black', showVoteBoard: false, votes: []})
+        })
+        server.socket.on('chancellorPickPolicy', (message: string) => {
+            updateHostGameState({ message, messageColor: 'black'})
         })
 
         return () => {
@@ -93,7 +96,8 @@ export function useHostGameState(): { hostGameState: HostGameState; updateHostGa
             server.socket.off('vote')
             server.socket.off('votePassed')
             server.socket.off('voteFailed')
-            server.socket.off('pickPolicy')
+            server.socket.off('presidentPickPolicy')
+            server.socket.off('chancellorPickPolicy')
         }
     }, [hostGameState])
 
