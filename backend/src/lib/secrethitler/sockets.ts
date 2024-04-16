@@ -94,6 +94,7 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
 
         if (currentGame.yesVotes + currentGame.noVotes === currentGame.players.length) {
             if (currentGame.yesVotes > currentGame.noVotes) {
+                currentGame.failedElectionCount = 0
                 // emit to everyone that the vote passed
                 io.to(currentGame.host).emit('votePassed', 'The vote has passed. The president and chancellor will now enact a policy.')
 
@@ -101,8 +102,18 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
                 currentGame.president = currentGame.runningPresident
                 currentGame.chancellor = currentGame.runningChancellor
             } else {
-                // emit to everyone that the vote failed
-                io.to(currentGame.host).emit('voteFailed', 'The vote has failed. The next president will now nominate a chancellor.')
+                currentGame.failedElectionCount++
+
+                if (currentGame.failedElectionCount >= 3) {
+
+                } else {
+                    // emit to the host that the vote failed
+                    io.to(currentGame.host).emit('voteFailed', {
+                        message: 'The vote has failed. The next president will now nominate a chancellor.',
+                        failedElectionCount: currentGame.failedElectionCount
+                    })
+                }
+                
             }
             // reset votes
             currentGame.yesVotes = 0

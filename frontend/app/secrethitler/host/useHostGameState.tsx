@@ -15,6 +15,7 @@ export interface HostGameState {
     messageColor: string
     votes: { vote: boolean, name: string }[]
     showVoteBoard: boolean
+    failedElectionCount: number
 }
 
 const defaultGameState: HostGameState = { 
@@ -26,6 +27,7 @@ const defaultGameState: HostGameState = {
     messageColor: 'black', 
     votes: [], 
     showVoteBoard: false, 
+    failedElectionCount: 0
 }
 
 type PolicyState = { fascistPolicyCount: number, liberalPolicyCount: number } 
@@ -77,14 +79,14 @@ export function useHostGameState(): { hostGameState: HostGameState; updateHostGa
             updateHostGameState({ votes: [...hostGameState.votes, voteData] })  
         })
         server.socket.on('votePassed', (message: string) => {
-            updateHostGameState({showVoteBoard: true, message, messageColor: 'green'})
+            updateHostGameState({showVoteBoard: true, message, messageColor: 'green', failedElectionCount: 0})
 
             setTimeout(() => {
                 server.socket.emit('startPolicyPhase')
             }, 5000)
         })
-        server.socket.on('voteFailed', (message: string) => {
-            updateHostGameState({showVoteBoard: true, message, messageColor: 'red'})
+        server.socket.on('voteFailed', (data: any) => {
+            updateHostGameState({ showVoteBoard: true, message: data.message, messageColor: 'red', failedElectionCount: data.failedElectionCount })
 
             setTimeout(() => {
                 server.socket.emit('beginRound')

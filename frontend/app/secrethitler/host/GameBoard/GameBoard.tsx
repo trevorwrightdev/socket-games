@@ -3,6 +3,7 @@ import FascistBoard from './FascistBoard'
 import LiberalBoard from './LiberalBoard'
 import { HostGameState } from '../useHostGameState'
 import VoteDisplay from './VoteDisplay'
+import ElectionTracker from './ElectionTracker'
 
 type GameBoardProps = {
     hostGameState: HostGameState
@@ -29,6 +30,7 @@ const GameBoard:React.FC<GameBoardProps> = ({ hostGameState, liberalPolicyCount,
         <div className='flex flex-col items-center'>
             <FascistBoard fascistPolicyCount={fascistPolicyCount}/>
             <LiberalBoard liberalPolicyCount={liberalPolicyCount}/>
+            <ElectionTracker hostGameState={hostGameState}/>
             <p className='font-bold'>-------------------------------------------------------------</p>
             <p className={`text-xl mb-2 text-center ${getMessageColorClass(hostGameState.messageColor)}`}>{hostGameState.message}</p>
             <VoteDisplay hostGameState={hostGameState}/>
