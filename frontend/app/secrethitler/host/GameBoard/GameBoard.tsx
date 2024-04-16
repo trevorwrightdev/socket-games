@@ -22,6 +22,8 @@ const GameBoard:React.FC<GameBoardProps> = ({ hostGameState, liberalPolicyCount,
                 return 'text-red-500'; // Red text color
             case 'green':
                 return 'text-green-500'; // Green text color
+            case 'blue':
+                return 'text-blue-500'
             default:
                 return 'text-black'; // Fallback color
         }

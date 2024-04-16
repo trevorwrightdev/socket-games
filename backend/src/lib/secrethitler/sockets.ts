@@ -151,8 +151,7 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
         const currentGame = game as SecretHitler
 
         currentGame.enactPolicy(data)
-
-        io.to(currentGame.host).emit('newPolicyEnacted', { fascistPolicyCount: currentGame.fascistPolicyCount, liberalPolicyCount: currentGame.liberalPolicyCount })
-        beginRound(currentGame)
+        const playerName = currentGame.players.find(p => p.socketId === socket.id)?.name
+        io.to(currentGame.host).emit('newPolicyEnacted', { fascistPolicyCount: currentGame.fascistPolicyCount, liberalPolicyCount: currentGame.liberalPolicyCount, playerName, newPolicy: data })
     })
 }
