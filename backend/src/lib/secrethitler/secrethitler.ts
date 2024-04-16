@@ -25,6 +25,8 @@ export class SecretHitler extends Game {
     public yesVotes: number = 0
     public noVotes: number = 0
     public policyDeck: ('fascist' | 'liberal')[] = this.shufflePolicyDeck()
+    public fascistPolicyCount: number = 0
+    public liberalPolicyCount: number = 0
 
     public startGame() {
         this.inProgress = true
@@ -122,5 +124,13 @@ export class SecretHitler extends Game {
         }
 
         return eligibleChancellors
+    }
+
+    public enactPolicy(policy: 'fascist' | 'liberal') {
+        if (policy === 'fascist') {
+            this.fascistPolicyCount++
+        } else {
+            this.liberalPolicyCount++
+        }
     }
 }

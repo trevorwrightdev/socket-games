@@ -17,12 +17,24 @@ export interface HostGameState {
     showVoteBoard: boolean
 }
 
-const defaultGameState: HostGameState = { page: 'Main Menu', roomCode: '', error: '', players: [], message: '', messageColor: 'black', votes: [], showVoteBoard: false}
+const defaultGameState: HostGameState = { 
+    page: 'Main Menu', 
+    roomCode: '', 
+    error: '', 
+    players: [], 
+    message: '', 
+    messageColor: 'black', 
+    votes: [], 
+    showVoteBoard: false, 
+}
 
-export function useHostGameState(): { hostGameState: HostGameState; updateHostGameState: UpdateHostGameState, fade: boolean, currentPage: Page } {
+type PolicyState = { fascistPolicyCount: number, liberalPolicyCount: number } 
+
+export function useHostGameState(): { hostGameState: HostGameState; updateHostGameState: UpdateHostGameState, fade: boolean, currentPage: Page, policyState: PolicyState } {
     const [hostGameState, setHostGameState] = useState<HostGameState>(defaultGameState)
     const [currentPage, setCurrentPage] = useState<Page>(hostGameState.page)
     const [fade, setFade] = useState<boolean>(false)
+    const [policyState, setPolicyState] = useState<PolicyState>({ fascistPolicyCount: 0, liberalPolicyCount: 0 })
 
     function updateHostGameState(newState: Partial<HostGameState>) {
         setHostGameState({
@@ -84,6 +96,9 @@ export function useHostGameState(): { hostGameState: HostGameState; updateHostGa
         server.socket.on('chancellorPickPolicy', (message: string) => {
             updateHostGameState({ message, messageColor: 'black'})
         })
+        server.socket.on('newPolicyEnacted', (policyState) => {
+            setPolicyState(policyState)
+        })
 
         return () => {
             server.socket.off('error')
@@ -98,6 +113,7 @@ export function useHostGameState(): { hostGameState: HostGameState; updateHostGa
             server.socket.off('voteFailed')
             server.socket.off('presidentPickPolicy')
             server.socket.off('chancellorPickPolicy')
+            server.socket.off('newPolicyEnacted')
         }
     }, [hostGameState])
 
@@ -105,6 +121,7 @@ export function useHostGameState(): { hostGameState: HostGameState; updateHostGa
         hostGameState,
         updateHostGameState,
         fade,
-        currentPage
+        currentPage,
+        policyState,
     }
 }

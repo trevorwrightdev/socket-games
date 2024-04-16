@@ -6,9 +6,11 @@ import VoteDisplay from './VoteDisplay'
 
 type GameBoardProps = {
     hostGameState: HostGameState
+    liberalPolicyCount: number
+    fascistPolicyCount: number
 }
 
-const GameBoard:React.FC<GameBoardProps> = ({ hostGameState }) => {
+const GameBoard:React.FC<GameBoardProps> = ({ hostGameState, liberalPolicyCount, fascistPolicyCount }) => {
     
     const getMessageColorClass = (color: string) => {
         switch(color) {
@@ -25,8 +27,8 @@ const GameBoard:React.FC<GameBoardProps> = ({ hostGameState }) => {
 
     return (
         <div className='flex flex-col items-center'>
-            <FascistBoard />
-            <LiberalBoard />
+            <FascistBoard fascistPolicyCount={fascistPolicyCount}/>
+            <LiberalBoard liberalPolicyCount={liberalPolicyCount}/>
             <p className='font-bold'>-------------------------------------------------------------</p>
             <p className={`text-xl mb-2 text-center ${getMessageColorClass(hostGameState.messageColor)}`}>{hostGameState.message}</p>
             <VoteDisplay hostGameState={hostGameState}/>

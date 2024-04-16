@@ -125,4 +125,13 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
         io.to(currentGame.host).emit('chancellorPickPolicy', `Chancellor ${currentGame.chancellor.name} is now choosing a policy to enact.`)
         io.to(currentGame.chancellor.socketId).emit('chancellorPickPolicy', data)
     })
+
+    socketGames.On('enactPolicy', socket, ({ game, data }) => {
+        const currentGame = game as SecretHitler
+
+        currentGame.enactPolicy(data)
+
+        io.to(currentGame.host).emit('newPolicyEnacted', { fascistPolicyCount: currentGame.fascistPolicyCount, liberalPolicyCount: currentGame.liberalPolicyCount })
+        beginRound(currentGame)
+    })
 }
