@@ -109,12 +109,14 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
                 // Check for hitler election if 3 fascist policies
                 if (currentGame.fascistPolicyCount >= 3 && currentGame.chancellor.socketId === currentGame.roles.hitler.socketId) {
                     io.to(currentGame.host).emit('gameOver', {
-                        message: `${currentGame.roles.hitler.name} was Hitler and 3 fascist policies have been enacted. Fascists win!`,
+                        message: `${currentGame.roles.hitler.name} was Hitler and elected chancellor while 3 fascist policies had been enacted. Fascists win!`,
                         winners: 'fascist'
                     })
                 } else {
                     // emit to everyone that the vote passed
                     io.to(currentGame.host).emit('votePassed', 'The vote has passed. The president and chancellor will now enact a policy.')
+
+
                 }
             } else {
                 currentGame.failedElectionCount++
@@ -168,5 +170,20 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
         currentGame.enactPolicy(data)
         const playerName = currentGame.players.find(p => p.socketId === socket.id)?.name
         io.to(currentGame.host).emit('newPolicyEnacted', { fascistPolicyCount: currentGame.fascistPolicyCount, liberalPolicyCount: currentGame.liberalPolicyCount, playerName, newPolicy: data })
+    })
+
+    socketGames.On('presidentialPower', socket, ({ game }) => {
+        const currentGame = game as SecretHitler
+        const president = currentGame.president
+
+        if (currentGame.fascistPolicyCount === 1 || currentGame.fascistPolicyCount === 2) {
+            // investigate role
+            io.to(currentGame.host).emit('investigation', "The president is now investigating a player's role.")
+            io.to(president.socketId).emit('investigation', currentGame.getPlayersBesides(president))
+        } else if (currentGame.fascistPolicyCount === 3) {
+            // pick next president
+        } else if (currentGame.fascistPolicyCount === 4 || currentGame.fascistPolicyCount === 5) {
+            // kill player and unlock veto at 5
+        } 
     })
 }

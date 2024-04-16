@@ -107,7 +107,11 @@ export function useHostGameState(): { hostGameState: HostGameState; updateHostGa
             updateHostGameState({ message: `${data.playerName} has enacted a ${data.newPolicy.toUpperCase()} policy.`, messageColor: data.newPolicy === 'fascist' ? 'red' : 'blue'})
 
             setTimeout(() => {
-                server.socket.emit('beginRound')
+                if (data.newPolcy === 'fascist' && data.fascistPolicyCount < 6) {
+                    server.socket.emit('presidentialPower')
+                } else {
+                    server.socket.emit('beginRound')
+                }
             }, 5000)
         })
         server.socket.on('electionChaos', (data) => {

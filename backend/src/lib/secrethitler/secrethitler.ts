@@ -136,6 +136,10 @@ export class SecretHitler extends Game {
         return eligibleChancellors
     }
 
+    public getPlayersBesides(player: Player) {
+        return this.players.filter(p => p.socketId !== player.socketId)
+    }
+
     public enactPolicy(policy: 'fascist' | 'liberal') {
         if (policy === 'fascist') {
             this.fascistPolicyCount++
