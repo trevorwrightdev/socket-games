@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import server from '@/lib/server'
 import { Player } from '@/lib/utils'
 
-export type Page = 'Waiting' | 'ApproveRole' | 'Choose Chancellor' | 'Vote' | 'Pick Policy as President' | 'Pick Policy as Chancellor'
+export type Page = 'Waiting' | 'ApproveRole' | 'Choose Chancellor' | 'Vote' | 'Pick Policy as President' | 'Pick Policy as Chancellor' | 'Investigate'
 
 export type UpdatePlayGameState = (newState: Partial<PlayGameState>) => void
 
@@ -57,6 +57,9 @@ export function usePlayGameState(): { playGameState: PlayGameState; updatePlayGa
         server.socket.on('chancellorPickPolicy', (policies: ('fascist' | 'liberal')[]) => {
             updatePlayGameState({ page: 'Pick Policy as Chancellor', policies })
         })
+        server.socket.on('investigation', (players: Player[]) => {
+            updatePlayGameState({ page: 'Investigate', playerList: players })
+        })
 
         return () => {
             server.socket.off('error')
@@ -65,6 +68,7 @@ export function usePlayGameState(): { playGameState: PlayGameState; updatePlayGa
             server.socket.off('chancellorPicked')
             server.socket.off('presidentPickPolicy')
             server.socket.off('chancellorPickPolicy')
+            server.socket.off('investigation')
         }
     }, [playGameState])
 

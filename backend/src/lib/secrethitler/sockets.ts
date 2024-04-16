@@ -2,6 +2,7 @@ import { Socket, Server } from 'socket.io'
 import { SocketGames } from '../SocketGames'
 import { SecretHitler } from './secrethitler'
 import { Player } from '../utils'
+import Game from '../Game'
 
 export default function SecretHitlerSockets(io: Server, socket: Socket, socketGames: SocketGames) {
 
@@ -57,11 +58,6 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
         io.to(president.socketId).emit('chooseChancellor', currentGame.getEligibleChancellors(president))
     }
 
-    socketGames.On('beginRound', socket, ({ game }) => {
-        const currentGame = game as SecretHitler
-        beginRound(currentGame)
-    })
-
     socketGames.On('approveRole', socket, ({ game }) => {
         const currentGame = game as SecretHitler
         currentGame.roleApprovalCount++
@@ -116,7 +112,7 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
                     // emit to everyone that the vote passed
                     io.to(currentGame.host).emit('votePassed', 'The vote has passed. The president and chancellor will now enact a policy.')
 
-
+                    setTimeout(() => startPolicyPhase(currentGame), 5000)
                 }
             } else {
                 currentGame.failedElectionCount++
@@ -133,12 +129,16 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
                         fascistPolicyCount: currentGame.fascistPolicyCount,
                         liberalPolicyCount: currentGame.liberalPolicyCount
                     })
+
+                    setTimeout(() => beginRound(currentGame), 5000)
                 } else {
                     // emit to the host that the vote failed
                     io.to(currentGame.host).emit('voteFailed', {
                         message: 'The vote has failed. The next president will now nominate a chancellor.',
                         failedElectionCount: currentGame.failedElectionCount
                     })
+
+                    setTimeout(() => beginRound(currentGame), 5000)
                 }
                 
             }
@@ -148,14 +148,14 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
         }
     })
 
-    socketGames.On('startPolicyPhase', socket, ({ game }) => {
+    function startPolicyPhase(game: Game) {
         const currentGame = game as SecretHitler
 
         // at this point, the president and chancellor have been elected, and they need to enact policies
         const policyOptions = currentGame.getThreePolicyCards()
         io.to(currentGame.president.socketId).emit('presidentPickPolicy', policyOptions)
         io.to(currentGame.host).emit('presidentPickPolicy', `President ${currentGame.president.name} is choosing a policy to discard.`)
-    })
+    }
 
     socketGames.On('discardPolicy', socket, ({ game, data }) => {
         const currentGame = game as SecretHitler
@@ -170,20 +170,28 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
         currentGame.enactPolicy(data)
         const playerName = currentGame.players.find(p => p.socketId === socket.id)?.name
         io.to(currentGame.host).emit('newPolicyEnacted', { fascistPolicyCount: currentGame.fascistPolicyCount, liberalPolicyCount: currentGame.liberalPolicyCount, playerName, newPolicy: data })
+
+        setTimeout(() => {
+            if (data === 'fascist' && currentGame.fascistPolicyCount < 6) {
+                presidentialPower(currentGame)
+            } else {
+                beginRound(currentGame)
+            }
+        }, 5000)
     })
 
-    socketGames.On('presidentialPower', socket, ({ game }) => {
+    function presidentialPower(game: Game) {
         const currentGame = game as SecretHitler
         const president = currentGame.president
 
         if (currentGame.fascistPolicyCount === 1 || currentGame.fascistPolicyCount === 2) {
             // investigate role
-            io.to(currentGame.host).emit('investigation', "The president is now investigating a player's role.")
+            io.to(currentGame.host).emit('investigation', `President ${currentGame.president.name} is now investigating a player's party.`)
             io.to(president.socketId).emit('investigation', currentGame.getPlayersBesides(president))
         } else if (currentGame.fascistPolicyCount === 3) {
             // pick next president
         } else if (currentGame.fascistPolicyCount === 4 || currentGame.fascistPolicyCount === 5) {
             // kill player and unlock veto at 5
         } 
-    })
+    }
 }

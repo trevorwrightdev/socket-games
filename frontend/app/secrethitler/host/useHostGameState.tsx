@@ -70,6 +70,10 @@ export function useHostGameState(): { hostGameState: HostGameState; updateHostGa
         })
         server.socket.on('newPresident', (message: string) => {
             updateHostGameState({ votes: [], showVoteBoard: false, message, messageColor: 'black'})
+
+            if (failedElectionCount >= 3) {
+                setFailedElectionCount(0)
+            }
         })
         server.socket.on('chancellorPicked', ({ chancellor, president }: {chancellor: Player, president: Player}) => {
             updateHostGameState({ message: `${president.name} has nominated ${chancellor.name} as chancellor. Please vote to decide if these players should be elected.`, messageColor: 'black'})
@@ -80,18 +84,10 @@ export function useHostGameState(): { hostGameState: HostGameState; updateHostGa
         server.socket.on('votePassed', (message: string) => {
             updateHostGameState({showVoteBoard: true, message, messageColor: 'green'})
             setFailedElectionCount(0)
-
-            setTimeout(() => {
-                server.socket.emit('startPolicyPhase')
-            }, 5000)
         })
         server.socket.on('voteFailed', (data: any) => {
             updateHostGameState({ showVoteBoard: true, message: data.message, messageColor: 'red' })
             setFailedElectionCount(data.failedElectionCount)
-
-            setTimeout(() => {
-                server.socket.emit('beginRound')
-            }, 5000)
         })
         server.socket.on('presidentPickPolicy', (message: string) => {
             updateHostGameState({ message, messageColor: 'black', showVoteBoard: false, votes: []})
@@ -105,14 +101,6 @@ export function useHostGameState(): { hostGameState: HostGameState; updateHostGa
                 liberalPolicyCount: data.liberalPolicyCount
             })
             updateHostGameState({ message: `${data.playerName} has enacted a ${data.newPolicy.toUpperCase()} policy.`, messageColor: data.newPolicy === 'fascist' ? 'red' : 'blue'})
-
-            setTimeout(() => {
-                if (data.newPolcy === 'fascist' && data.fascistPolicyCount < 6) {
-                    server.socket.emit('presidentialPower')
-                } else {
-                    server.socket.emit('beginRound')
-                }
-            }, 5000)
         })
         server.socket.on('electionChaos', (data) => {
             updateHostGameState({ message: data.message, messageColor: 'red'})
@@ -121,14 +109,12 @@ export function useHostGameState(): { hostGameState: HostGameState; updateHostGa
                 liberalPolicyCount: data.liberalPolicyCount
             })
             setFailedElectionCount(3)
-
-            setTimeout(() => {
-                server.socket.emit('beginRound')
-                setFailedElectionCount(0)
-            }, 5000)
         })
         server.socket.on('gameOver', (data) => {
             updateHostGameState({ message: data.message, messageColor: data.winners === 'fascist' ? 'red' : 'blue'})
+        })
+        server.socket.on('investigation', (message: string) => {
+            updateHostGameState({ message, messageColor: 'black'})
         })
 
         return () => {
@@ -147,6 +133,7 @@ export function useHostGameState(): { hostGameState: HostGameState; updateHostGa
             server.socket.off('newPolicyEnacted')
             server.socket.off('electionChaos')
             server.socket.off('gameOver')
+            server.socket.off('investigation')
         }
     }, [hostGameState])
 

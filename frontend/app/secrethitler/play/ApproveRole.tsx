@@ -36,7 +36,7 @@ const ApproveRole:React.FC<ApproveRoleProps> = ({ roleData, updatePlayGameState 
                 <div className='flex flex-col items-center'>
                     <p>The other fascists are:</p>
                     {roleData.otherFascists.map((fascistName: any) => (
-                        <p>
+                        <p key={fascistName}>
                             {fascistName}
                         </p>
                     ))}

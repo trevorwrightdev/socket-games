@@ -36,6 +36,10 @@ class Server {
         return await betterFetch(`${api_url}/codevalid?code=${code}`)
     }
 
+    public async getRole(code: string, playerSocketId: string): Promise<[any, string | null]> {
+        return await betterFetch(`${api_url}/getrole?code=${code}&playerSocketId=${playerSocketId}`)
+    }
+
 }
 
 const server = new Server()

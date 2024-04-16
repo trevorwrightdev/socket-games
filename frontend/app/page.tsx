@@ -16,7 +16,7 @@ const links = [
 ]
 
 export default function Home() {
-    const [codeValid, setcodeValid] = useState<boolean>(false)
+    const [codeValid, setCodeValid] = useState<boolean>(false)
     const [code, setCode] = useState<string>('')
     const [name, setName] = useState<string>('')
     const [error, setError] = useState<string>('')
@@ -31,13 +31,13 @@ export default function Home() {
         setCode(newCode)
 
         if (newCode.length !== 4) {
-            setcodeValid(false)
+            setCodeValid(false)
             return
         }
 
         const [data, error] = await server.validateCode(newCode)
         if (!error) {
-            setcodeValid(data)
+            setCodeValid(data)
         }
     }
 
