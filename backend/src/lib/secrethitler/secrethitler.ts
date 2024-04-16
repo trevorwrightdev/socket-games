@@ -24,6 +24,7 @@ export class SecretHitler extends Game {
     public chancellor: Player = {} as Player
     public yesVotes: number = 0
     public noVotes: number = 0
+    public policyDeck: ('fascist' | 'liberal')[] = this.shufflePolicyDeck()
 
     public startGame() {
         this.inProgress = true
@@ -76,6 +77,39 @@ export class SecretHitler extends Game {
             [array[i], array[j]] = [array[j], array[i]];
         }
         return array;
+    }
+
+    public shufflePolicyDeck() {
+        const startingDeck = [
+            'liberal',
+            'liberal',
+            'liberal',
+            'liberal',
+            'liberal',
+            'liberal',
+            'fascist',
+            'fascist',
+            'fascist',
+            'fascist',
+            'fascist',
+            'fascist',
+            'fascist',
+            'fascist',
+            'fascist',
+            'fascist',
+            'fascist',
+        ]
+
+        return this.shuffleArray(startingDeck)
+    }
+
+    public getThreePolicyCards() {
+        // shuffle the deck if not enough cards
+        if (this.policyDeck.length < 3) {
+            this.policyDeck = this.shufflePolicyDeck()
+        }
+
+        return this.policyDeck.splice(0, 3)
     }
 
     public getEligibleChancellors(president: Player) {

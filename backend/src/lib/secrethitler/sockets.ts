@@ -109,4 +109,13 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
             currentGame.noVotes = 0
         }
     })
+
+    socketGames.On('startPolicyPhase', socket, ({ game }) => {
+        const currentGame = game as SecretHitler
+
+        // at this point, the president and chancellor have been elected, and they need to enact policies
+        const policyOptions = currentGame.getThreePolicyCards()
+        io.to(currentGame.president.socketId).emit('pickPolicy', policyOptions)
+        io.to(currentGame.host).emit('pickPolicy', `${currentGame.president.name} is choosing a policy to discard.`)
+    })
 }

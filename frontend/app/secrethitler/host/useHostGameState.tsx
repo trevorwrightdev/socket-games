@@ -31,10 +31,6 @@ export function useHostGameState(): { hostGameState: HostGameState; updateHostGa
         })
     }
 
-    function setMessage(message: string, color?: string) {
-        updateHostGameState({ message, messageColor: color || 'black' })
-    }
-
     useEffect(() => {
         setFade(true)
         setTimeout(() => {
@@ -63,20 +59,27 @@ export function useHostGameState(): { hostGameState: HostGameState; updateHostGa
             updateHostGameState({ votes: [], showVoteBoard: false, message, messageColor: 'black'})
         })
         server.socket.on('chancellorPicked', ({ chancellor, president }: {chancellor: Player, president: Player}) => {
-            setMessage(`${president.name} has nominated ${chancellor.name} as chancellor. Please vote to decide if these players should be elected.`)
+            updateHostGameState({ message: `${president.name} has nominated ${chancellor.name} as chancellor. Please vote to decide if these players should be elected.`, messageColor: 'black'})
         })
         server.socket.on('vote', (voteData: { vote: boolean, name: string }) => {
             updateHostGameState({ votes: [...hostGameState.votes, voteData] })  
         })
         server.socket.on('votePassed', (message: string) => {
             updateHostGameState({showVoteBoard: true, message, messageColor: 'green'})
+
+            setTimeout(() => {
+                server.socket.emit('startPolicyPhase')
+            }, 5000)
         })
         server.socket.on('voteFailed', (message: string) => {
             updateHostGameState({showVoteBoard: true, message, messageColor: 'red'})
 
             setTimeout(() => {
                 server.socket.emit('beginRound')
-            }, 7000)
+            }, 5000)
+        })
+        server.socket.on('pickPolicy', (message: string) => {
+            updateHostGameState({ message, messageColor: 'black', showVoteBoard: false, votes: []})
         })
 
         return () => {
@@ -90,6 +93,7 @@ export function useHostGameState(): { hostGameState: HostGameState; updateHostGa
             server.socket.off('vote')
             server.socket.off('votePassed')
             server.socket.off('voteFailed')
+            server.socket.off('pickPolicy')
         }
     }, [hostGameState])
 

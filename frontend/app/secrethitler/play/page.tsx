@@ -6,6 +6,7 @@ import ApproveRole from './ApproveRole'
 import { useGlobalState } from '@/app/components/GlobalContextProvider'
 import ChooseChancellor from './ChooseChancellor'
 import Vote from './Vote'
+import PickPolicyAsPresident from './PickPolicyAsPresident'
 
 export default function Play() {
 
@@ -28,6 +29,9 @@ export default function Play() {
                     )}
                     {currentPage === 'Vote' && (
                         <Vote playGameState={playGameState} updatePlayGameState={updatePlayGameState}/>
+                    )}
+                    {currentPage === 'Pick Policy as President' && (
+                        <PickPolicyAsPresident playGameState={playGameState} updatePlayGameState={updatePlayGameState}/>
                     )}
                 </div>
             </FadeContainer>
