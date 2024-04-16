@@ -105,7 +105,17 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
                 currentGame.failedElectionCount++
 
                 if (currentGame.failedElectionCount >= 3) {
+                    const policy = currentGame.getOnePolicyCard()
+                    currentGame.enactPolicy(policy)
+                    // reset last chancellor and president 
+                    currentGame.chancellor = {} as Player
+                    currentGame.president = {} as Player
 
+                    io.to(currentGame.host).emit('electionChaos', {
+                        message: 'The election has failed 3 times in a row. The top policy card has been enacted and each player is now eligible for election.',
+                        fascistPolicyCount: currentGame.fascistPolicyCount,
+                        liberalPolicyCount: currentGame.liberalPolicyCount
+                    })
                 } else {
                     // emit to the host that the vote failed
                     io.to(currentGame.host).emit('voteFailed', {

@@ -2,12 +2,10 @@ import React from 'react'
 import { HostGameState } from '../useHostGameState'
 
 type ElectionTrackerProps = {
-    hostGameState: HostGameState
+    failedElectionCount: number
 }
 
-const ElectionTracker:React.FC<ElectionTrackerProps> = ({ hostGameState }) => {
-    
-    const failedElectionCount = hostGameState.failedElectionCount
+const ElectionTracker:React.FC<ElectionTrackerProps> = ({ failedElectionCount }) => {
     
     return (
         <div className='flex flex-col items-center'>
