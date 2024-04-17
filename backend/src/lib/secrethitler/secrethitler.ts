@@ -28,6 +28,7 @@ export class SecretHitler extends Game {
     public fascistPolicyCount: number = 0
     public liberalPolicyCount: number = 0
     public failedElectionCount: number = 0
+    public playersInvestigated: Player[] = []
 
     public startGame() {
         this.inProgress = true
@@ -73,13 +74,14 @@ export class SecretHitler extends Game {
     }
 
     public shuffleArray(array: any[]) {
-        for (let i = array.length - 1; i > 0; i--) {
+        const arrayCopy = [...array]
+        for (let i = arrayCopy.length - 1; i > 0; i--) {
             // Generate a random index from 0 to i
             const j = Math.floor(Math.random() * (i + 1));
             // Swap elements at indices i and j
-            [array[i], array[j]] = [array[j], array[i]];
+            [arrayCopy[i], arrayCopy[j]] = [arrayCopy[j], arrayCopy[i]];
         }
-        return array;
+        return arrayCopy;
     }
 
     public shufflePolicyDeck() {
@@ -136,8 +138,13 @@ export class SecretHitler extends Game {
         return eligibleChancellors
     }
 
-    public getPlayersBesides(player: Player) {
-        return this.players.filter(p => p.socketId !== player.socketId)
+    public getPlayersToInvestigate(player: Player): Player[] {
+        const playersToInvestigate = this.players.filter(p => 
+            p.socketId !== player.socketId && 
+            !this.playersInvestigated.some(investigatedPlayer => investigatedPlayer.socketId === p.socketId)
+        )
+
+        return playersToInvestigate
     }
 
     public enactPolicy(policy: 'fascist' | 'liberal') {

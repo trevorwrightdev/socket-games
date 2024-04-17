@@ -18,4 +18,8 @@ export default class Game {
         })
         this.socketIds.add(socketId)
     }
+
+    public getPlayerBySocketId(socketId: string) {
+        return this.players.find(p => p.socketId === socketId)
+    }
 }

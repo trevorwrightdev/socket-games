@@ -35,7 +35,7 @@ const GameBoard:React.FC<GameBoardProps> = ({ hostGameState, liberalPolicyCount,
             <LiberalBoard liberalPolicyCount={liberalPolicyCount}/>
             <ElectionTracker failedElectionCount={failedElectionCount}/>
             <p className='font-bold'>-------------------------------------------------------------</p>
-            <p className={`text-xl mb-2 text-center ${getMessageColorClass(hostGameState.messageColor)}`}>{hostGameState.message}</p>
+            <p className={`text-xl mb-2 text-center max-w-[800px] ${getMessageColorClass(hostGameState.messageColor)}`}>{hostGameState.message}</p>
             <VoteDisplay hostGameState={hostGameState}/>
         </div>
     )

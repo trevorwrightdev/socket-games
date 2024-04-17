@@ -15,6 +15,11 @@ const InvestigateRole:React.FC<InvestigateRoleProps> = ({ playGameState, updateP
 
     const [globalState] = useGlobalState()
 
+    function handleGotIt() {
+        server.socket.emit('finishedInvestigation', roleData!.name)
+        updatePlayGameState({ page: 'Waiting' })
+    }
+
     return (
         <div className='flex flex-col items-center gap-2'>
             {!roleData && <h1>Choose a player to investigate.</h1>}
@@ -22,7 +27,6 @@ const InvestigateRole:React.FC<InvestigateRoleProps> = ({ playGameState, updateP
 
                 const investigatePlayer = async () => { 
                     const [role, error] = await server.getRole(globalState.roomCode, player.socketId)
-                    console.log('ROLE OBJECT: ', role, 'ROLE PROPERTY: ', role.role)
                     if (error) return console.error(error)
                     setRoleData({
                         name: player.name,
@@ -37,7 +41,7 @@ const InvestigateRole:React.FC<InvestigateRoleProps> = ({ playGameState, updateP
                     <p className={`${roleData.role === 'fascist' ? 'text-red-500' : 'text-blue-500'}`}>
                         {roleData.name} is a {roleData.role.toUpperCase()}.
                     </p>
-                    <RainbowButton>Got it!</RainbowButton>
+                    <RainbowButton onClick={handleGotIt}>Got it!</RainbowButton>
                 </>
                 
             )}

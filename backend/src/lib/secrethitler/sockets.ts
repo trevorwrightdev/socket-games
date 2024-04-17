@@ -186,12 +186,24 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
 
         if (currentGame.fascistPolicyCount === 1 || currentGame.fascistPolicyCount === 2) {
             // investigate role
-            io.to(currentGame.host).emit('investigation', `President ${currentGame.president.name} is now investigating a player's party.`)
-            io.to(president.socketId).emit('investigation', currentGame.getPlayersBesides(president))
+            io.to(currentGame.host).emit('message', `President ${currentGame.president.name} is now investigating a player's party.`)
+            io.to(president.socketId).emit('investigation', currentGame.getPlayersToInvestigate(president))
         } else if (currentGame.fascistPolicyCount === 3) {
             // pick next president
+            io.to(currentGame.host).emit('message', `President ${currentGame.president.name} is now choosing the next president.`)
         } else if (currentGame.fascistPolicyCount === 4 || currentGame.fascistPolicyCount === 5) {
             // kill player and unlock veto at 5
         } 
     }
+
+    socketGames.On('finishedInvestigation', socket, ({ game, data }) => {
+        const currentGame = game as SecretHitler
+        const playerInvestigatedName = data
+        
+        io.to(currentGame.host).emit('message', `President ${currentGame.president.name} has investigated ${playerInvestigatedName}.`)
+
+        setTimeout(() => {
+            beginRound(currentGame)
+        }, 5000)
+    })
 }

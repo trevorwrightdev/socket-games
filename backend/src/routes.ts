@@ -30,6 +30,16 @@ export default function routes(socketGames: SocketGames): Router {
 
         const game = socketGames.roomCodeToGame[code as string] as SecretHitler
 
+        const player = game.getPlayerBySocketId(playerSocketId as string)
+
+        if (!player) {
+            res.status(400).json({ error: "Invalid player." })
+            return
+        }
+
+        // add to players investigated
+        game.playersInvestigated.push(player)
+
         if (!game || game.gameType !== 'Secret Hitler') {
             res.status(400).json({ error: "Invalid game." })
             return
