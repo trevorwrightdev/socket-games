@@ -45,14 +45,14 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
         }
     })
 
-    function beginRound(currentGame: SecretHitler) {
+    function beginRound(currentGame: SecretHitler, specificPresident?: Player) {
         const gameOverMessage = currentGame.getGameOverMessage()
         if (gameOverMessage) {
             io.to(currentGame.host).emit('gameOver', gameOverMessage)
             return
         }
 
-        const president = currentGame.getNextPresident()
+        const president = specificPresident || currentGame.getNextPresident()
         currentGame.runningPresident = president
         io.to(currentGame.host).emit('newPresident', `${president.name} is the president. ${president.name}, please choose your chancellor.`)
         io.to(president.socketId).emit('chooseChancellor', currentGame.getEligibleChancellors(president))
@@ -192,6 +192,7 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
         } else if (power === 'pick president') {
             // pick next president
             io.to(currentGame.host).emit('message', `President ${currentGame.president.name} is now choosing the next president.`)
+            io.to(currentGame.president.socketId).emit('pickNextPresident', currentGame.getPlayersBesides(currentGame.president))
         } else if (power === 'peek') {
             // peek top 3 cards
         } else if (power === 'kill') {
@@ -207,6 +208,17 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
 
         setTimeout(() => {
             beginRound(currentGame)
+        }, 5000)
+    })
+
+    socketGames.On('pickPresident', socket, ({ game, data }) => {
+        const newPresident = data as Player
+        const currentGame = game as SecretHitler
+
+        io.to(currentGame.host).emit('message', `President ${currentGame.president.name} has chosen ${newPresident.name} as the next president.`)
+
+        setTimeout(() => {
+            beginRound(currentGame, newPresident)
         }, 5000)
     })
 }
