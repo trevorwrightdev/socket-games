@@ -31,7 +31,7 @@ const GameBoard:React.FC<GameBoardProps> = ({ hostGameState, liberalPolicyCount,
 
     return (
         <div className='flex flex-col items-center'>
-            <FascistBoard fascistPolicyCount={fascistPolicyCount}/>
+            <FascistBoard fascistPolicyCount={fascistPolicyCount} playerCount={hostGameState.players.length}/>
             <LiberalBoard liberalPolicyCount={liberalPolicyCount}/>
             <ElectionTracker failedElectionCount={failedElectionCount}/>
             <p className='font-bold'>-------------------------------------------------------------</p>

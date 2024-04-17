@@ -7,6 +7,8 @@ export interface Roles {
     fascists: Player[]
 }
 
+export type PresidentialPower = 'investigate' | 'peek' | 'pick president' | 'kill' | 'none'
+
 export class SecretHitler extends Game {
     public gameType: GameType = 'Secret Hitler'
     public minPlayers: number = 5
@@ -29,11 +31,13 @@ export class SecretHitler extends Game {
     public liberalPolicyCount: number = 0
     public failedElectionCount: number = 0
     public playersInvestigated: Player[] = []
+    public initialPlayerCount: number = 0
 
     public startGame() {
         this.inProgress = true
         this.assignRoles()
         this.shufflePolicyDeck()
+        this.initialPlayerCount = this.players.length
     }
 
     public getNextPresident() {
@@ -170,5 +174,39 @@ export class SecretHitler extends Game {
             }
         }
         return null
+    }
+
+    public getPresidentialPower(): PresidentialPower {
+        if (this.fascistPolicyCount === 1) {
+            if (this.initialPlayerCount < 7) {
+                return 'none'
+            } else if (this.initialPlayerCount < 9) {
+                return 'none'
+            } else {
+                return 'investigate'
+            }
+        } else if (this.fascistPolicyCount === 2) {
+            if (this.initialPlayerCount < 7) {
+                return 'none'
+            } else if (this.initialPlayerCount < 9) {
+                return 'investigate'
+            } else {
+                return 'investigate'
+            }
+        } else if (this.fascistPolicyCount === 3) {
+            if (this.initialPlayerCount < 7) {
+                return 'peek'
+            } else if (this.initialPlayerCount < 9) {
+                return 'pick president'
+            } else {
+                return 'pick president'
+            }
+        } else if (this.fascistPolicyCount === 4) {
+            return 'kill'
+        } else if (this.fascistPolicyCount === 5) {
+            return 'kill'
+        }
+
+        return 'none'
     }
 }

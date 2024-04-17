@@ -1,6 +1,6 @@
 import { Socket, Server } from 'socket.io'
 import { SocketGames } from '../SocketGames'
-import { SecretHitler } from './secrethitler'
+import { SecretHitler, PresidentialPower } from './secrethitler'
 import { Player } from '../utils'
 import Game from '../Game'
 
@@ -172,28 +172,31 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
         io.to(currentGame.host).emit('newPolicyEnacted', { fascistPolicyCount: currentGame.fascistPolicyCount, liberalPolicyCount: currentGame.liberalPolicyCount, playerName, newPolicy: data })
 
         setTimeout(() => {
-            if (data === 'fascist' && currentGame.fascistPolicyCount < 6) {
-                presidentialPower(currentGame)
+            const power = currentGame.getPresidentialPower()
+            if (data === 'fascist' && currentGame.fascistPolicyCount < 6 && power !== 'none') {
+                presidentialPower(currentGame, power)
             } else {
                 beginRound(currentGame)
             }
         }, 5000)
     })
 
-    function presidentialPower(game: Game) {
+    function presidentialPower(game: Game, power: PresidentialPower) {
         const currentGame = game as SecretHitler
         const president = currentGame.president
 
-        if (currentGame.fascistPolicyCount === 1 || currentGame.fascistPolicyCount === 2) {
+        if (power === 'investigate') {
             // investigate role
             io.to(currentGame.host).emit('message', `President ${currentGame.president.name} is now investigating a player's party.`)
             io.to(president.socketId).emit('investigation', currentGame.getPlayersToInvestigate(president))
-        } else if (currentGame.fascistPolicyCount === 3) {
+        } else if (power === 'pick president') {
             // pick next president
             io.to(currentGame.host).emit('message', `President ${currentGame.president.name} is now choosing the next president.`)
-        } else if (currentGame.fascistPolicyCount === 4 || currentGame.fascistPolicyCount === 5) {
-            // kill player and unlock veto at 5
-        } 
+        } else if (power === 'peek') {
+            // peek top 3 cards
+        } else if (power === 'kill') {
+            // kill player
+        }
     }
 
     socketGames.On('finishedInvestigation', socket, ({ game, data }) => {
