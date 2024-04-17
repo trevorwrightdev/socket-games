@@ -121,6 +121,10 @@ export class SecretHitler extends Game {
         return this.policyDeck.splice(0, 1)[0]
     }
 
+    public peekTopThreePolicies() {
+        return this.policyDeck.slice(0, 3)
+    }
+
     public getEligibleChancellors(president: Player) {
         // cannot be the current president or the last chancellor
         let eligibleChancellors = this.players.filter(p => p.socketId !== president.socketId && p.socketId !== this.chancellor.socketId)

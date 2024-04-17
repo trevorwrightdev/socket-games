@@ -10,6 +10,7 @@ import PickPolicyAsPresident from './PickPolicyAsPresident'
 import PickPolicyAsChancellor from './PickPolicyAsChancellor'
 import InvestigateRole from './InvestigateRole'
 import PickPresident from './PickPresident'
+import PeekPolicies from './PeekPolicies'
 
 export default function Play() {
 
@@ -44,6 +45,9 @@ export default function Play() {
                     )}
                     {currentPage === 'Pick Next President' && (
                         <PickPresident playGameState={playGameState} updatePlayGameState={updatePlayGameState}/>
+                    )}
+                    {currentPage === 'Peek' && (
+                        <PeekPolicies playGameState={playGameState} updatePlayGameState={updatePlayGameState}/>
                     )}
                 </div>
             </FadeContainer>

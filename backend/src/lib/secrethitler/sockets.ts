@@ -195,6 +195,8 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
             io.to(currentGame.president.socketId).emit('pickNextPresident', currentGame.getPlayersBesides(currentGame.president))
         } else if (power === 'peek') {
             // peek top 3 cards
+            io.to(currentGame.host).emit('message', `President ${currentGame.president.name} is now peeking at the top 3 policy cards in the deck.`)
+            io.to(currentGame.president.socketId).emit('peek', currentGame.peekTopThreePolicies())
         } else if (power === 'kill') {
             // kill player
         }
@@ -220,5 +222,9 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
         setTimeout(() => {
             beginRound(currentGame, newPresident)
         }, 5000)
+    })
+
+    socketGames.On('finishedPeeking', socket, ({ game, data }) => {
+        beginRound(game as SecretHitler)
     })
 }

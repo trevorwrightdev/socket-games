@@ -32,15 +32,11 @@ const ApproveRole:React.FC<ApproveRoleProps> = ({ roleData, updatePlayGameState 
             {roleData.hitler && (
                 <p>{roleData.hitler} is HITLER.</p>
             )}
-            {roleData.otherFascists && roleData.otherFascists.length > 0 && (
-                <div className='flex flex-col items-center'>
-                    <p>The other fascists are:</p>
-                    {roleData.otherFascists.map((fascistName: any) => (
-                        <p key={fascistName}>
-                            {fascistName}
-                        </p>
-                    ))}
-                </div>
+            {roleData.otherFascists && roleData.otherFascists.length === 1 && (
+                <p>The other fascist is {roleData.otherFascists[0]}.</p>
+            )}
+            {roleData.otherFascists && roleData.otherFascists.length > 1 && (
+                <p>The other fascists are {`${roleData.otherFascists[0]} and ${roleData.otherFascists[1]}.`}</p>
             )}
             <RainbowButton onClick={handleApproval}>Got it!</RainbowButton>
         </div>
