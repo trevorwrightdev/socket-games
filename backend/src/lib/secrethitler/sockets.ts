@@ -161,7 +161,11 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
         const currentGame = game as SecretHitler
 
         io.to(currentGame.host).emit('chancellorPickPolicy', `Chancellor ${currentGame.chancellor.name} is now choosing a policy to enact.`)
-        io.to(currentGame.chancellor.socketId).emit('chancellorPickPolicy', data)
+        io.to(currentGame.chancellor.socketId).emit('chancellorPickPolicy', {
+            policies: data,
+            // TODO: Change to if fascist policy count is greater than 5
+            canVeto: true
+        })
     })
 
     socketGames.On('enactPolicy', socket, ({ game, data }) => {
@@ -199,6 +203,8 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
             io.to(currentGame.president.socketId).emit('peek', currentGame.peekTopThreePolicies())
         } else if (power === 'kill') {
             // kill player
+            io.to(currentGame.host).emit('message', `President ${currentGame.president.name} is now choosing a player to kill!`)
+            io.to(currentGame.president.socketId).emit('kill', currentGame.getPlayersBesides(currentGame.president))
         }
     }
 
@@ -224,7 +230,38 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
         }, 5000)
     })
 
-    socketGames.On('finishedPeeking', socket, ({ game, data }) => {
+    socketGames.On('finishedPeeking', socket, ({ game }) => {
         beginRound(game as SecretHitler)
+    })
+
+    socketGames.On('pickedKill', socket, ({ game, data }) => {
+        const currentGame = game as SecretHitler
+        const playerToKill = data as Player
+
+        currentGame.killPlayer(playerToKill)
+        io.to(currentGame.host).emit('message', `President ${currentGame.president.name} has killed ${playerToKill.name}!`)
+        io.to(playerToKill.socketId).emit('youDied')
+
+        setTimeout(() => {
+            if (playerToKill.socketId === currentGame.roles.hitler.socketId) {
+                io.to(currentGame.host).emit('gameOver', {
+                    message: `${currentGame.roles.hitler.name} was Hitler and has been killed. Liberals win!`,
+                    winners: 'liberal'
+                })
+            } else {
+                beginRound(currentGame)
+            }
+        }, 5000)
+    })
+
+    socketGames.On('requestVeto', socket, ({ game }) => {
+        const currentGame = game as SecretHitler
+        io.to(currentGame.host).emit('message', `Chancellor ${currentGame.chancellor.name} has requested a veto from President ${currentGame.president.name}.`)
+
+        io.to(currentGame.president.socketId).emit('requestVeto')
+    })
+
+    socketGames.On('veto', socket, ({ game, data }) => {
+        const veto = data as boolean
     })
 }

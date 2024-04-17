@@ -217,4 +217,8 @@ export class SecretHitler extends Game {
 
         return 'none'
     }
+
+    public killPlayer(player: Player) {
+        this.players = this.players.filter(p => p.socketId !== player.socketId)
+    }
 }
