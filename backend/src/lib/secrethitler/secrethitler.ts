@@ -24,7 +24,7 @@ export class SecretHitler extends Game {
     public chancellor: Player = {} as Player
     public yesVotes: number = 0
     public noVotes: number = 0
-    public policyDeck: ('fascist' | 'liberal')[] = this.shufflePolicyDeck()
+    public policyDeck: ('fascist' | 'liberal')[] = []
     public fascistPolicyCount: number = 0
     public liberalPolicyCount: number = 0
     public failedElectionCount: number = 0
@@ -33,6 +33,7 @@ export class SecretHitler extends Game {
     public startGame() {
         this.inProgress = true
         this.assignRoles()
+        this.shufflePolicyDeck()
     }
 
     public getNextPresident() {
@@ -105,24 +106,14 @@ export class SecretHitler extends Game {
             'fascist',
         ]
 
-        return this.shuffleArray(startingDeck)
+        this.policyDeck = this.shuffleArray(startingDeck)
     }
 
     public getThreePolicyCards() {
-        // shuffle the deck if not enough cards
-        if (this.policyDeck.length < 3) {
-            this.policyDeck = this.shufflePolicyDeck()
-        }
-
         return this.policyDeck.splice(0, 3)
     }
     
     public getOnePolicyCard() {
-        // shuffle the deck if not enough cards
-        if (this.policyDeck.length < 1) {
-            this.policyDeck = this.shufflePolicyDeck()
-        }
-
         return this.policyDeck.splice(0, 1)[0]
     }
 
@@ -153,13 +144,18 @@ export class SecretHitler extends Game {
         } else {
             this.liberalPolicyCount++
         }
+
+        // reshuffle the deck if there are less than 3 cards left
+        if (this.policyDeck.length < 3) {
+            this.shufflePolicyDeck()
+        }
     }
 
     public getGameOverMessage() {
         const hitlerAlive = this.players.some(p => p.socketId === this.roles.hitler.socketId)
-        if (this.liberalPolicyCount >= 6) {
+        if (this.liberalPolicyCount >= 5) {
             return {
-                message: 'Liberals have enacted 6 policies. Liberals win!',
+                message: 'Liberals have enacted 5 policies. Liberals win!',
                 winners: 'liberal'
             }
         } else if (this.fascistPolicyCount >= 6) {

@@ -16,7 +16,6 @@ const LiberalBoard:React.FC<LiberalBoardProps> = ({ liberalPolicyCount }) => {
                 <GameBoardCell className={`${liberalPolicyCount >= 3 ? 'bg-blue-500' : ''} border-blue-500 border-8`} /> 
                 <GameBoardCell className={`${liberalPolicyCount >= 4 ? 'bg-blue-500' : ''} border-blue-500 border-8`} /> 
                 <GameBoardCell className={`${liberalPolicyCount >= 5 ? 'bg-blue-500' : ''} border-blue-500 border-8`} /> 
-                <GameBoardCell className={`${liberalPolicyCount >= 6 ? 'bg-blue-500' : ''} border-blue-500 border-8`} /> 
             </div>
         </div>
     )
