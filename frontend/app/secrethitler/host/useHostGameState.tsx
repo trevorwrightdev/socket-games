@@ -113,8 +113,8 @@ export function useHostGameState(): { hostGameState: HostGameState; updateHostGa
         server.socket.on('gameOver', (data) => {
             updateHostGameState({ message: data.message, messageColor: data.winners === 'fascist' ? 'red' : 'blue'})
         })
-        server.socket.on('message', (message: string) => {
-            updateHostGameState({ message, messageColor: message.includes('kill') ? 'red' : 'black'})
+        server.socket.on('message', (data: { message: string, color: string }) => {
+            updateHostGameState({ message: data.message, messageColor: data.color || 'black'})
         })
 
         return () => {

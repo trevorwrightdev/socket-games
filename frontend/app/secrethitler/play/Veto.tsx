@@ -19,10 +19,10 @@ const Veto:React.FC<VetoProps> = ({ updatePlayGameState }) => {
     }
 
     return (
-        <div className='flex flex-col items-center'>
+        <div className='flex flex-col items-center gap-2'>
             <h1>Would you like to veto the current policies?</h1>
-            <button className='rounded-md py-2 px-4 font-bold text-black bg-blue-500' onClick={veto}>YES</button>
-            <button className='rounded-md py-2 px-4 font-bold text-black bg-red-500' onClick={noVeto}>NO</button>
+            <button className='rounded-md py-2 px-4 font-bold text-black bg-blue-500 w-16' onClick={veto}>YES</button>
+            <button className='rounded-md py-2 px-4 font-bold text-black bg-red-500 w-16' onClick={noVeto}>NO</button>
         </div>
     )
 }

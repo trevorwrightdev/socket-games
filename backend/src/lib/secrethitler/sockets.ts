@@ -191,19 +191,31 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
 
         if (power === 'investigate') {
             // investigate role
-            io.to(currentGame.host).emit('message', `President ${currentGame.president.name} is now investigating a player's party.`)
+            io.to(currentGame.host).emit('message', {
+                message: `President ${currentGame.president.name} is now investigating a player's party.`,
+                color: 'black'
+            })
             io.to(president.socketId).emit('investigation', currentGame.getPlayersToInvestigate(president))
         } else if (power === 'pick president') {
             // pick next president
-            io.to(currentGame.host).emit('message', `President ${currentGame.president.name} is now choosing the next president.`)
+            io.to(currentGame.host).emit('message', {
+                message: `President ${currentGame.president.name} is now choosing the next president.`,
+                color: 'black'
+            })
             io.to(currentGame.president.socketId).emit('pickNextPresident', currentGame.getPlayersBesides(currentGame.president))
         } else if (power === 'peek') {
             // peek top 3 cards
-            io.to(currentGame.host).emit('message', `President ${currentGame.president.name} is now peeking at the top 3 policy cards in the deck.`)
+            io.to(currentGame.host).emit('message', {
+                message: `President ${currentGame.president.name} is now peeking at the top 3 policy cards in the deck.`,
+                color: 'black'
+            })
             io.to(currentGame.president.socketId).emit('peek', currentGame.peekTopThreePolicies())
         } else if (power === 'kill') {
             // kill player
-            io.to(currentGame.host).emit('message', `President ${currentGame.president.name} is now choosing a player to kill!`)
+            io.to(currentGame.host).emit('message', {
+                message: `President ${currentGame.president.name} is now choosing a player to kill!`,
+                color: 'red'
+            })
             io.to(currentGame.president.socketId).emit('kill', currentGame.getPlayersBesides(currentGame.president))
         }
     }
@@ -212,7 +224,10 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
         const currentGame = game as SecretHitler
         const playerInvestigatedName = data
         
-        io.to(currentGame.host).emit('message', `President ${currentGame.president.name} has investigated ${playerInvestigatedName}.`)
+        io.to(currentGame.host).emit('message', {
+            message: `President ${currentGame.president.name} has investigated ${playerInvestigatedName}.`,
+            color: 'black'
+        })
 
         setTimeout(() => {
             beginRound(currentGame)
@@ -223,7 +238,10 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
         const newPresident = data as Player
         const currentGame = game as SecretHitler
 
-        io.to(currentGame.host).emit('message', `President ${currentGame.president.name} has chosen ${newPresident.name} as the next president.`)
+        io.to(currentGame.host).emit('message', {
+            message: `President ${currentGame.president.name} has chosen ${newPresident.name} as the next president.`,
+            color: 'black'
+        })
 
         setTimeout(() => {
             beginRound(currentGame, newPresident)
@@ -239,7 +257,10 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
         const playerToKill = data as Player
 
         currentGame.killPlayer(playerToKill)
-        io.to(currentGame.host).emit('message', `President ${currentGame.president.name} has killed ${playerToKill.name}!`)
+        io.to(currentGame.host).emit('message', {
+            message: `President ${currentGame.president.name} has killed ${playerToKill.name}!`,
+            color: 'red'
+        })
         io.to(playerToKill.socketId).emit('youDied')
 
         setTimeout(() => {
@@ -256,12 +277,25 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
 
     socketGames.On('requestVeto', socket, ({ game }) => {
         const currentGame = game as SecretHitler
-        io.to(currentGame.host).emit('message', `Chancellor ${currentGame.chancellor.name} has requested a veto from President ${currentGame.president.name}.`)
-
+        io.to(currentGame.host).emit('message', {
+            message: `Chancellor ${currentGame.chancellor.name} has requested a veto from President ${currentGame.president.name}.`,
+            color: 'black'
+        })
         io.to(currentGame.president.socketId).emit('requestVeto')
     })
 
     socketGames.On('veto', socket, ({ game, data }) => {
+        const currentGame = game as SecretHitler
         const veto = data as boolean
+
+        if (veto) {
+
+        } else {
+            io.to(currentGame.chancellor.socketId).emit('vetoResult', false)
+            io.to(currentGame.host).emit('message', {
+                message: `President ${currentGame.president.name} has denied the veto request from chancellor ${currentGame.chancellor.name}.`,
+                color: 'red'
+            })
+        }
     })
 }
