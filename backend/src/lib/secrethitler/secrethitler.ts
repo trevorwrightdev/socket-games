@@ -127,11 +127,11 @@ export class SecretHitler extends Game {
 
     public getEligibleChancellors(president: Player) {
         // cannot be the current president or the last chancellor
-        let eligibleChancellors = this.players.filter(p => p.socketId !== president.socketId && p.socketId !== this.chancellor.socketId)
+        let eligibleChancellors = this.players.filter(p => p.clientId !== president.clientId && p.clientId !== this.chancellor.clientId)
 
         if (this.players.length > 5) {
             // if more than 5 players in the game, last president is ineligible
-            eligibleChancellors = eligibleChancellors.filter(p => p.socketId !== this.president.socketId)
+            eligibleChancellors = eligibleChancellors.filter(p => p.clientId !== this.president.clientId)
         }
 
         return eligibleChancellors
@@ -139,15 +139,15 @@ export class SecretHitler extends Game {
 
     public getPlayersToInvestigate(player: Player): Player[] {
         const playersToInvestigate = this.players.filter(p => 
-            p.socketId !== player.socketId && 
-            !this.playersInvestigated.some(investigatedPlayer => investigatedPlayer.socketId === p.socketId)
+            p.clientId !== player.clientId && 
+            !this.playersInvestigated.some(investigatedPlayer => investigatedPlayer.clientId === p.clientId)
         )
 
         return playersToInvestigate
     }
 
     public getPlayersBesides(player: Player): Player[] {
-        return this.players.filter(p => p.socketId !== player.socketId)
+        return this.players.filter(p => p.clientId !== player.clientId)
     }
 
     public enactPolicy(policy: 'fascist' | 'liberal') {
@@ -164,7 +164,7 @@ export class SecretHitler extends Game {
     }
 
     public getGameOverMessage() {
-        const hitlerAlive = this.players.some(p => p.socketId === this.roles.hitler.socketId)
+        const hitlerAlive = this.players.some(p => p.clientId === this.roles.hitler.clientId)
         if (this.liberalPolicyCount >= 5) {
             return {
                 message: 'Liberals have enacted 5 policies. Liberals win!',
@@ -219,6 +219,42 @@ export class SecretHitler extends Game {
     }
 
     public killPlayer(player: Player) {
-        this.players = this.players.filter(p => p.socketId !== player.socketId)
+        this.players = this.players.filter(p => p.clientId !== player.clientId)
+    }
+
+    public swapSocketId(clientId: string, socketId: string): void {
+        super.swapSocketId(clientId, socketId)
+
+        if (this.president.clientId === clientId) {
+            this.president.socketId = socketId
+        }
+
+        if (this.chancellor.clientId === clientId) {
+            this.chancellor.socketId = socketId
+        }
+
+        if (this.runningPresident.clientId === clientId) {
+            this.runningPresident.socketId = socketId
+        }
+
+        if (this.runningChancellor.clientId === clientId) {
+            this.runningChancellor.socketId = socketId
+        }
+
+        if (this.roles.hitler.clientId === clientId) {
+            this.roles.hitler.socketId = socketId
+        }
+
+        for (const fascist of this.roles.fascists) {
+            if (fascist.clientId === clientId) {
+                fascist.socketId = socketId
+            }
+        }
+
+        for (const liberal of this.roles.liberals) {
+            if (liberal.clientId === clientId) {
+                liberal.socketId = socketId
+            }
+        }
     }
 }

@@ -1,10 +1,11 @@
 import { Socket, Server } from 'socket.io'
-import { GameType } from './lib/utils'
+import { GameType, CustomSocket } from './lib/utils'
 import { SocketGames } from './lib/SocketGames'
 import SecretHitlerSockets from './lib/secrethitler/sockets'
+import Game from './lib/Game'
 
-export default function socketEvents(io: Server, socket: Socket, socketGames: SocketGames) {
-    console.log(`User ${socket.id} connected.`)
+export default function socketEvents(io: Server, socket: CustomSocket, socketGames: SocketGames) {
+    console.log(`User ${socket.handshake.query.clientId} connected.`)
 
     socket.on('createRoom', (gameType: GameType) => {
         socketGames.createRoom(gameType, socket)
@@ -16,7 +17,25 @@ export default function socketEvents(io: Server, socket: Socket, socketGames: So
 
     socket.on('disconnect', () => {
         // TODO: Handle disconnections by removing the player from the game only if the game hasnt started yet 
-        console.log(`User ${socket.id} disconnected.`)
+        console.log(`User ${socket.handshake.query.clientId} disconnected.`)
+    })
+
+    socket.on('resync', (lastWaitTimestamp: number) => {
+        const roomCode = socketGames.userToRoomCode[socket.handshake.query.clientId]
+        const game = socketGames.roomCodeToGame[roomCode]
+        if (!game) {
+            socket.emit('error', 'Room not found.')
+            return
+        }
+
+        game.swapSocketId(socket.handshake.query.clientId, socket.id)
+
+        const socketEvent = game.pastSocketEvents[socket.handshake.query.clientId]
+        if (lastWaitTimestamp > socketEvent.timestamp) {
+            return
+        }
+
+        socketGames.EmitToID(socket.id, socketEvent.event, io, socket, socketEvent.data)
     })
 
     SecretHitlerSockets(io, socket, socketGames)

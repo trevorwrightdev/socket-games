@@ -1,7 +1,7 @@
 import { SecretHitler } from './secrethitler/secrethitler'
-import { GameType, isValidGame } from './utils'
+import { GameType, isValidGame, CustomSocket } from './utils'
 import { CodeGenerator } from './codegenerator'
-import { Server, Socket } from 'socket.io'
+import { Server } from 'socket.io'
 import Game from './Game'
 
 type RoomCodeToGame = {
@@ -18,7 +18,7 @@ export class SocketGames {
     public roomCodeToGame: RoomCodeToGame = {}
     public userToRoomCode: UserToRoomCode = {}
 
-    public createRoom(gameType: GameType, socket: Socket) {
+    public createRoom(gameType: GameType, socket: CustomSocket) {
         if (!isValidGame(gameType)) {
             socket.emit('error', 'Invalid game type.')
             return
@@ -36,15 +36,18 @@ export class SocketGames {
         }
 
         this.roomCodeToGame[roomCode] = game
-        this.userToRoomCode[socket.id] = roomCode
-        game.host = socket.id
+        this.userToRoomCode[socket.handshake.query.clientId] = roomCode
+        game.host = {
+            clientId: socket.handshake.query.clientId,
+            socketId: socket.id
+        }
 
         socket.join(roomCode)
-        console.log(`User ${socket.id} created room ${roomCode} for game ${gameType}.`)
+        console.log(`User ${socket.handshake.query.clientId} created room ${roomCode} for game ${gameType}.`)
         socket.emit('roomCreated', roomCode)
     }
 
-    public joinRoom(code: string, name: string, socket: Socket, io: Server) {
+    public joinRoom(code: string, name: string, socket: CustomSocket, io: Server) {
         if (!this.codeIsValid(code)) {
             socket.emit('error', 'Invalid room code.')
             return
@@ -72,11 +75,11 @@ export class SocketGames {
             return
         }
 
-        this.userToRoomCode[socket.id] = code
-        game.addPlayer(socket.id, name)
+        this.userToRoomCode[socket.handshake.query.clientId] = code
+        game.addPlayer(socket.handshake.query.clientId, name, socket.id)
         socket.join(code)
         
-        console.log(`User ${socket.id} joined room ${code}.`)
+        console.log(`User ${socket.handshake.query.clientId} joined room ${code}.`)
 
         const gameType = game.gameType
         socket.emit('roomJoined', {
@@ -84,16 +87,17 @@ export class SocketGames {
             name,
             roomCode: code,
         })
-        io.to(game.host).emit('playerJoined', game.players)
+        io.to(game.host.socketId).emit('playerJoined', game.players)
     }
 
     public codeIsValid(code: string): boolean {
         return !!this.roomCodeToGame[code]
     }
 
-    public On(eventName: string, socket: Socket, callback: OnEventCallback) {
+    public On(eventName: string, socket: CustomSocket, callback: OnEventCallback) {
         socket.on(eventName, (data: any) => {
-            const game = this.roomCodeToGame[this.userToRoomCode[socket.id]]
+            const roomCode = this.userToRoomCode[socket.handshake.query.clientId]
+            const game = this.roomCodeToGame[roomCode]
             if (!game) {
                 socket.emit('error', 'You are not in this room, or this room does not exist.')
                 return
@@ -102,16 +106,25 @@ export class SocketGames {
         })
     }
 
-    public Broadcast(eventName: string, io: Server, game: Game, data?: any) {
-        io.to(game.host).emit(eventName, data)
+    public Broadcast(eventName: string, io: Server, socket: CustomSocket, game: Game, data?: any) {
+        io.to(game.host.socketId).emit(eventName, data)
+        game.addEvent(game.host.socketId, eventName, data)
         for (const player of game.players) {
-            io.to(player.socketId).emit(eventName, data)
+            this.EmitToID(player.socketId, eventName, io, socket, data)
         }
     }
 
-    public EmitToPlayers(eventName: string, io: Server, game: Game, data?: any) {
-        for (const player of game.players) {
-            io.to(player.socketId).emit(eventName, data)
+    public EmitToID(socketId: string, eventName: string, io: Server, socket: CustomSocket, data?: any) {
+        const roomCode = this.userToRoomCode[socket.handshake.query.clientId]
+        const game = this.roomCodeToGame[roomCode]
+        if (!game) {
+            socket.emit('error', 'You are not in this room, or this room does not exist.')
+            return
         }
+        const player = game.players.find(player => player.socketId === socketId)
+        if (player) {
+            game.addEvent(player.clientId, eventName, data)
+        }
+        io.to(socketId).emit(eventName, data)
     }
 }

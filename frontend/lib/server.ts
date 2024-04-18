@@ -21,8 +21,34 @@ async function betterFetch(url: string): Promise<[any, string | null]> {
     }
 }
 
+function generateClientId() {
+    return 'xxxx-xxxx-xxxx-xxxx'.replace(/[x]/g, function(c) {
+        const r = (Math.random() * 16) | 0;
+        return r.toString(16);
+    })
+}
+
 class Server {
-    public socket = io(api_url)
+    public socket = io(api_url, {
+        reconnection: true,
+        reconnectionAttempts: 5,
+        reconnectionDelay: 2000,
+        query: {
+            clientId: generateClientId()
+        }
+    })
+
+    constructor() {
+        this.socket.on('disconnect', () => {
+            this.socket.connect()
+        })
+    }
+
+    public resync(timestamp: number) {
+        this.socket.connect()
+
+        this.socket.emit('resync', timestamp)
+    }
 
     public createRoom(gameType: GameType) {
         this.socket.emit('createRoom', gameType)
@@ -36,8 +62,8 @@ class Server {
         return await betterFetch(`${api_url}/codevalid?code=${code}`)
     }
 
-    public async getRole(code: string, playerSocketId: string): Promise<[any, string | null]> {
-        return await betterFetch(`${api_url}/getrole?code=${code}&playerSocketId=${playerSocketId}`)
+    public async getRole(code: string, playerClientId: string): Promise<[any, string | null]> {
+        return await betterFetch(`${api_url}/getrole?code=${code}&playerClientId=${playerClientId}`)
     }
 
 }

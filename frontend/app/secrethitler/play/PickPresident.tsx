@@ -17,10 +17,9 @@ const PickPresident:React.FC<PickPresidentProps> = ({ playGameState, updatePlayG
 
                 const pickPresident = () => {
                     server.socket.emit('pickPresident', player)
-                    updatePlayGameState({ page: 'Waiting' })
                 }
 
-                return <RainbowButton key={player.socketId} onClick={pickPresident}>{player.name}</RainbowButton>
+                return <RainbowButton key={player.clientId} onClick={pickPresident}>{player.name}</RainbowButton>
             })}
         </div>
     )

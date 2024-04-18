@@ -11,7 +11,6 @@ const Vote:React.FC<VoteProps> = ({ playGameState, updatePlayGameState }) => {
     
     function handleVote(vote: boolean) {
         server.socket.emit('vote', vote)
-        updatePlayGameState({ page: 'Waiting' })
     }
 
     return (

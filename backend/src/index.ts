@@ -5,6 +5,7 @@ import { SocketGames } from './lib/SocketGames'
 import routes from './routes'
 import socketEvents from './sockets'
 import cors from 'cors'
+import { CustomSocket } from './lib/utils'
 
 require('dotenv').config()
 
@@ -26,9 +27,21 @@ const io = new SocketIOServer(server, {
 // Initialize SocketGames
 const socketGames = new SocketGames()
 
+io.use((socket, next) => {
+  const clientId = socket.handshake.query.clientId;
+  if (!clientId) {
+    // Reject the connection by calling next with an error.
+    const error = new Error("ClientId is required");
+    next(error);
+  } else {
+    // If clientId is provided, proceed with the connection.
+    next();
+  }
+});
+
 // Handle a connection
 io.on('connection', (socket) => {
-    socketEvents(io, socket, socketGames)
+    socketEvents(io, socket as CustomSocket, socketGames)
 })
 
 // Set up routes
