@@ -7,6 +7,8 @@ export interface Roles {
     fascists: Player[]
 }
 
+export type PresidentialPower = 'investigate' | 'peek' | 'pick president' | 'kill' | 'none'
+
 export class SecretHitler extends Game {
     public gameType: GameType = 'Secret Hitler'
     public minPlayers: number = 5
@@ -18,29 +20,33 @@ export class SecretHitler extends Game {
     }
     public roleApprovalCount: number = 0
     public presidentIndex: number = -1
-    public lastPresident: Player = {} as Player
-    public lastChancellor: Player = {} as Player
-    // TODO: When players die, remove them from this list
-    public livingPlayers: Player[] = []
+    public runningPresident: Player = {} as Player
+    public runningChancellor: Player = {} as Player
+    public president: Player = {} as Player
+    public chancellor: Player = {} as Player
+    public yesVotes: number = 0
+    public noVotes: number = 0
+    public policyDeck: ('fascist' | 'liberal')[] = []
+    public fascistPolicyCount: number = 0
+    public liberalPolicyCount: number = 0
+    public failedElectionCount: number = 0
+    public playersInvestigated: Player[] = []
+    public initialPlayerCount: number = 0
 
     public startGame() {
         this.inProgress = true
         this.assignRoles()
-        this.livingPlayers = this.players
+        this.shufflePolicyDeck()
+        this.initialPlayerCount = this.players.length
     }
 
     public getNextPresident() {
-        if (this.presidentIndex !== -1) {
-            // the current president becomes the last president
-            this.lastPresident = this.livingPlayers[this.presidentIndex]
-        }
-
         // now, we have a new current president
         this.presidentIndex++
-        if (this.presidentIndex >= this.livingPlayers.length) {
+        if (this.presidentIndex >= this.players.length) {
             this.presidentIndex = 0
         }
-        return this.livingPlayers[this.presidentIndex]
+        return this.players[this.presidentIndex]
     }
 
     public assignRoles() {
@@ -73,24 +79,146 @@ export class SecretHitler extends Game {
     }
 
     public shuffleArray(array: any[]) {
-        for (let i = array.length - 1; i > 0; i--) {
+        const arrayCopy = [...array]
+        for (let i = arrayCopy.length - 1; i > 0; i--) {
             // Generate a random index from 0 to i
             const j = Math.floor(Math.random() * (i + 1));
             // Swap elements at indices i and j
-            [array[i], array[j]] = [array[j], array[i]];
+            [arrayCopy[i], arrayCopy[j]] = [arrayCopy[j], arrayCopy[i]];
         }
-        return array;
+        return arrayCopy;
+    }
+
+    public shufflePolicyDeck() {
+        const startingDeck = [
+            'liberal',
+            'liberal',
+            'liberal',
+            'liberal',
+            'liberal',
+            'liberal',
+            'fascist',
+            'fascist',
+            'fascist',
+            'fascist',
+            'fascist',
+            'fascist',
+            'fascist',
+            'fascist',
+            'fascist',
+            'fascist',
+            'fascist',
+        ]
+
+        this.policyDeck = this.shuffleArray(startingDeck)
+    }
+
+    public getThreePolicyCards() {
+        return this.policyDeck.splice(0, 3)
+    }
+    
+    public getOnePolicyCard() {
+        return this.policyDeck.splice(0, 1)[0]
+    }
+
+    public peekTopThreePolicies() {
+        return this.policyDeck.slice(0, 3)
     }
 
     public getEligibleChancellors(president: Player) {
         // cannot be the current president or the last chancellor
-        let eligibleChancellors = this.livingPlayers.filter(p => p.socketId !== president.socketId && p.socketId !== this.lastChancellor.socketId)
+        let eligibleChancellors = this.players.filter(p => p.socketId !== president.socketId && p.socketId !== this.chancellor.socketId)
 
-        if (this.livingPlayers.length <= 5) {
-            // if only 5 players in the game, last president is also ineligible
-            eligibleChancellors = eligibleChancellors.filter(p => p.socketId !== this.lastPresident.socketId)
+        if (this.players.length > 5) {
+            // if more than 5 players in the game, last president is ineligible
+            eligibleChancellors = eligibleChancellors.filter(p => p.socketId !== this.president.socketId)
         }
 
         return eligibleChancellors
+    }
+
+    public getPlayersToInvestigate(player: Player): Player[] {
+        const playersToInvestigate = this.players.filter(p => 
+            p.socketId !== player.socketId && 
+            !this.playersInvestigated.some(investigatedPlayer => investigatedPlayer.socketId === p.socketId)
+        )
+
+        return playersToInvestigate
+    }
+
+    public getPlayersBesides(player: Player): Player[] {
+        return this.players.filter(p => p.socketId !== player.socketId)
+    }
+
+    public enactPolicy(policy: 'fascist' | 'liberal') {
+        if (policy === 'fascist') {
+            this.fascistPolicyCount++
+        } else {
+            this.liberalPolicyCount++
+        }
+        this.failedElectionCount = 0
+        // reshuffle the deck if there are less than 3 cards left
+        if (this.policyDeck.length < 3) {
+            this.shufflePolicyDeck()
+        }
+    }
+
+    public getGameOverMessage() {
+        const hitlerAlive = this.players.some(p => p.socketId === this.roles.hitler.socketId)
+        if (this.liberalPolicyCount >= 5) {
+            return {
+                message: 'Liberals have enacted 5 policies. Liberals win!',
+                winners: 'liberal'
+            }
+        } else if (this.fascistPolicyCount >= 6) {
+            return {
+                message: 'Fascists have enacted 6 policies. Facscists win!',
+                winners: 'fascist'
+            }
+        } else if (hitlerAlive === false) {
+            return {
+                message: `${this.roles.hitler.name} was Hitler and has been killed. Liberals win!`,
+                winners: 'liberal'
+            }
+        }
+        return null
+    }
+
+    public getPresidentialPower(): PresidentialPower {
+        if (this.fascistPolicyCount === 1) {
+            if (this.initialPlayerCount < 7) {
+                return 'none'
+            } else if (this.initialPlayerCount < 9) {
+                return 'none'
+            } else {
+                return 'investigate'
+            }
+        } else if (this.fascistPolicyCount === 2) {
+            if (this.initialPlayerCount < 7) {
+                return 'none'
+            } else if (this.initialPlayerCount < 9) {
+                return 'investigate'
+            } else {
+                return 'investigate'
+            }
+        } else if (this.fascistPolicyCount === 3) {
+            if (this.initialPlayerCount < 7) {
+                return 'peek'
+            } else if (this.initialPlayerCount < 9) {
+                return 'pick president'
+            } else {
+                return 'pick president'
+            }
+        } else if (this.fascistPolicyCount === 4) {
+            return 'kill'
+        } else if (this.fascistPolicyCount === 5) {
+            return 'kill'
+        }
+
+        return 'none'
+    }
+
+    public killPlayer(player: Player) {
+        this.players = this.players.filter(p => p.socketId !== player.socketId)
     }
 }

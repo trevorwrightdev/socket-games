@@ -5,6 +5,15 @@ import FadeContainer from '@/app/components/FadeContainer'
 import ApproveRole from './ApproveRole'
 import { useGlobalState } from '@/app/components/GlobalContextProvider'
 import ChooseChancellor from './ChooseChancellor'
+import Vote from './Vote'
+import PickPolicyAsPresident from './PickPolicyAsPresident'
+import PickPolicyAsChancellor from './PickPolicyAsChancellor'
+import InvestigateRole from './InvestigateRole'
+import PickPresident from './PickPresident'
+import PeekPolicies from './PeekPolicies'
+import ChoosePlayerToKill from './ChoosePlayerToKill'
+import Message from './Message'
+import Veto from './Veto'
 
 export default function Play() {
 
@@ -24,6 +33,33 @@ export default function Play() {
                     )}
                     {currentPage === 'Choose Chancellor' && (
                         <ChooseChancellor playGameState={playGameState} updatePlayGameState={updatePlayGameState}/>
+                    )}
+                    {currentPage === 'Vote' && (
+                        <Vote playGameState={playGameState} updatePlayGameState={updatePlayGameState}/>
+                    )}
+                    {currentPage === 'Pick Policy as President' && (
+                        <PickPolicyAsPresident playGameState={playGameState} updatePlayGameState={updatePlayGameState}/>
+                    )}
+                    {currentPage === 'Pick Policy as Chancellor' && (
+                        <PickPolicyAsChancellor playGameState={playGameState} updatePlayGameState={updatePlayGameState}/>
+                    )}
+                    {currentPage === 'Investigate' && (
+                        <InvestigateRole playGameState={playGameState} updatePlayGameState={updatePlayGameState}/>
+                    )}
+                    {currentPage === 'Pick Next President' && (
+                        <PickPresident playGameState={playGameState} updatePlayGameState={updatePlayGameState}/>
+                    )}
+                    {currentPage === 'Peek' && (
+                        <PeekPolicies playGameState={playGameState} updatePlayGameState={updatePlayGameState}/>
+                    )}
+                    {currentPage === 'Kill Player' && (
+                        <ChoosePlayerToKill playGameState={playGameState} updatePlayGameState={updatePlayGameState}/>
+                    )}
+                    {currentPage === 'Message' && (
+                        <Message playGameState={playGameState}/>
+                    )}
+                    {currentPage === 'Veto' && (
+                        <Veto updatePlayGameState={updatePlayGameState}/>
                     )}
                 </div>
             </FadeContainer>
