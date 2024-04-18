@@ -10,12 +10,10 @@ const Veto:React.FC<VetoProps> = ({ updatePlayGameState }) => {
     
     function veto() {
         server.socket.emit('veto', true)
-        updatePlayGameState({ page: 'Waiting' })
     }
 
     function noVeto() {
         server.socket.emit('veto', false)
-        updatePlayGameState({ page: 'Waiting' })
     }
 
     return (

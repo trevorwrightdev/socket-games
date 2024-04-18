@@ -125,7 +125,6 @@ export class SocketGames {
         if (player) {
             game.addEvent(player.clientId, eventName, data)
         }
-        console.log(`Sending ${eventName} data to socket id: ${socketId}`)
         io.to(socketId).emit(eventName, data)
     }
 }

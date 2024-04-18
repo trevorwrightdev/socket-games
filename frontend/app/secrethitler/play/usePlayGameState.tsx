@@ -83,6 +83,9 @@ export function usePlayGameState(): { playGameState: PlayGameState; updatePlayGa
         server.socket.on('requestVeto', () => {
             updatePlayGameState({ page: 'Veto' })
         })
+        server.socket.on('success', () => {
+            updatePlayGameState({ page: 'Waiting' })
+        })
 
         return () => {
             server.socket.off('error')
@@ -97,6 +100,7 @@ export function usePlayGameState(): { playGameState: PlayGameState; updatePlayGa
             server.socket.off('kill')
             server.socket.off('youDied')
             server.socket.off('requestVeto')
+            server.socket.off('success')
         }
     }, [playGameState])
 

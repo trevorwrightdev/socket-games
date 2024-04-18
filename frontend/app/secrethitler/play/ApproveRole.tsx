@@ -12,7 +12,6 @@ const ApproveRole:React.FC<ApproveRoleProps> = ({ roleData, updatePlayGameState 
 
     function handleApproval() {
         server.socket.emit('approveRole')
-        updatePlayGameState({ page: 'Waiting' })
     }
     
     return (

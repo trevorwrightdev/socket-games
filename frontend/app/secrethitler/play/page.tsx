@@ -66,7 +66,7 @@ export default function Play() {
                     {currentPage === 'Veto' && (
                         <Veto updatePlayGameState={updatePlayGameState}/>
                     )}
-                    <button className='text-sm text-white absolute top-[350px] opacity-10 bg-gray-900 rounded-md px-1' onClick={() => server.socket.disconnect()}>disconnect</button>
+                    {process.env.NEXT_PUBLIC_DEV_MODE && <button className='text-sm text-white absolute top-[350px] opacity-10 bg-gray-900 rounded-md px-1' onClick={() => server.socket.disconnect()}>disconnect</button>}
                     <button className='text-sm text-white absolute top-[400px] opacity-10 bg-gray-900 rounded-md px-1' onClick={resync}>resync</button>
                 </div>
             </FadeContainer>

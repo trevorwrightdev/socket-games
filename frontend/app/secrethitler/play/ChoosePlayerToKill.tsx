@@ -17,7 +17,6 @@ const ChoosePlayerToKill:React.FC<ChoosePlayerToKill> = ({ playGameState, update
 
                 const killPlayer = () => {
                     server.socket.emit('pickedKill', player)
-                    updatePlayGameState({ page: 'Waiting' })
                 }
 
                 return <RainbowButton key={player.clientId} onClick={killPlayer}>{player.name}</RainbowButton>

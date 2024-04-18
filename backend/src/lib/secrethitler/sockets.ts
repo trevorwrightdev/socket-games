@@ -60,6 +60,8 @@ export default function SecretHitlerSockets(io: Server, socket: CustomSocket, so
     }
 
     socketGames.On('approveRole', socket, ({ game }) => {
+        socketGames.EmitToID(socket.id, 'success', io, socket)
+
         const currentGame = game as SecretHitler
         currentGame.roleApprovalCount++
 
@@ -70,6 +72,8 @@ export default function SecretHitlerSockets(io: Server, socket: CustomSocket, so
     })
 
     socketGames.On('pickChancellor', socket, ({ game, data }) => {
+        socketGames.EmitToID(socket.id, 'success', io, socket)
+
         const currentGame = game as SecretHitler
         const player = data as Player
         currentGame.runningChancellor = player
@@ -82,6 +86,8 @@ export default function SecretHitlerSockets(io: Server, socket: CustomSocket, so
     })
 
     socketGames.On('vote', socket, ({ game, data }) => {
+        socketGames.EmitToID(socket.id, 'success', io, socket)
+
         const currentGame = game as SecretHitler
         const player = currentGame.players.find(p => p.clientId === socket.handshake.query.clientId)
         socketGames.EmitToID(currentGame.host.socketId, 'vote', io, socket, { name: player?.name, vote: data })
@@ -156,10 +162,11 @@ export default function SecretHitlerSockets(io: Server, socket: CustomSocket, so
     }
 
     socketGames.On('discardPolicy', socket, ({ game, data }) => {
+        socketGames.EmitToID(socket.id, 'success', io, socket)
+
         const currentGame = game as SecretHitler
 
         socketGames.EmitToID(currentGame.host.socketId, 'chancellorPickPolicy', io, socket, `Chancellor ${currentGame.chancellor.name} is now choosing a policy to enact.`)
-        console.log('Emitting cards to chancellor...')
         socketGames.EmitToID(currentGame.chancellor.socketId, 'chancellorPickPolicy', io, socket, {
             policies: data,
             canVeto: currentGame.fascistPolicyCount >= 5
@@ -167,6 +174,8 @@ export default function SecretHitlerSockets(io: Server, socket: CustomSocket, so
     })
 
     socketGames.On('enactPolicy', socket, ({ game, data }) => {
+        socketGames.EmitToID(socket.id, 'success', io, socket)
+
         const currentGame = game as SecretHitler
 
         currentGame.enactPolicy(data)
@@ -218,6 +227,8 @@ export default function SecretHitlerSockets(io: Server, socket: CustomSocket, so
     }
 
     socketGames.On('finishedInvestigation', socket, ({ game, data }) => {
+        socketGames.EmitToID(socket.id, 'success', io, socket)
+
         const currentGame = game as SecretHitler
         const playerInvestigatedName = data
         socketGames.EmitToID(currentGame.host.socketId, 'message', io, socket, {
@@ -231,6 +242,8 @@ export default function SecretHitlerSockets(io: Server, socket: CustomSocket, so
     })
 
     socketGames.On('pickPresident', socket, ({ game, data }) => {
+        socketGames.EmitToID(socket.id, 'success', io, socket)
+
         const newPresident = data as Player
         const currentGame = game as SecretHitler
 
@@ -249,6 +262,8 @@ export default function SecretHitlerSockets(io: Server, socket: CustomSocket, so
     })
 
     socketGames.On('pickedKill', socket, ({ game, data }) => {
+        socketGames.EmitToID(socket.id, 'success', io, socket)
+
         const currentGame = game as SecretHitler
         const playerToKill = data as Player
 
@@ -281,6 +296,8 @@ export default function SecretHitlerSockets(io: Server, socket: CustomSocket, so
     })
 
     socketGames.On('veto', socket, ({ game, data }) => {
+        socketGames.EmitToID(socket.id, 'success', io, socket)
+
         const currentGame = game as SecretHitler
         const veto = data as boolean
 

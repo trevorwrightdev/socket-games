@@ -41,7 +41,6 @@ const PickPolicyAsChancellor:React.FC<PickPolicyAsChancellorProps> = ({ playGame
 
                         const handlePolicyDiscard = () => {
                             server.socket.emit('enactPolicy', policy)
-                            updatePlayGameState({ page: 'Waiting' })
                         }
 
                         return (

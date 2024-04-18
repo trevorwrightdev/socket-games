@@ -17,7 +17,6 @@ const PickPolicyAsPresident:React.FC<PickPolicyAsPresidentProps> = ({ playGameSt
                 const handlePolicyDiscard = () => {
                     const newPolicies = playGameState.policies.filter((_, i) => i !== index)
                     server.socket.emit('discardPolicy', newPolicies)
-                    updatePlayGameState({ page: 'Waiting' })
                 }
 
                 return (

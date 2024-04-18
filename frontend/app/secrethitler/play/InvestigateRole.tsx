@@ -17,7 +17,6 @@ const InvestigateRole:React.FC<InvestigateRoleProps> = ({ playGameState, updateP
 
     function handleGotIt() {
         server.socket.emit('finishedInvestigation', roleData!.name)
-        updatePlayGameState({ page: 'Waiting' })
     }
 
     return (
