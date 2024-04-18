@@ -104,14 +104,27 @@ export class SocketGames {
 
     public Broadcast(eventName: string, io: Server, game: Game, data?: any) {
         io.to(game.host).emit(eventName, data)
+        game.addEvent(game.host, eventName, data)
         for (const player of game.players) {
+            game.addEvent(player.socketId, eventName, data)
             io.to(player.socketId).emit(eventName, data)
         }
     }
 
     public EmitToPlayers(eventName: string, io: Server, game: Game, data?: any) {
         for (const player of game.players) {
+            game.addEvent(player.socketId, eventName, data)
             io.to(player.socketId).emit(eventName, data)
         }
+    }
+
+    public EmitToID(socketId: string, eventName: string, io: Server, socket: Socket, data?: any) {
+        const game = this.roomCodeToGame[this.userToRoomCode[socket.id]]
+        if (!game) {
+            socket.emit('error', 'You are not in this room, or this room does not exist.')
+            return
+        }
+        game.addEvent(socketId, eventName, data)
+        io.to(socketId).emit(eventName, data)
     }
 }

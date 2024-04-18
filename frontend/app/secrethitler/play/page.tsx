@@ -14,11 +14,17 @@ import PeekPolicies from './PeekPolicies'
 import ChoosePlayerToKill from './ChoosePlayerToKill'
 import Message from './Message'
 import Veto from './Veto'
+import server from '@/lib/server'
 
 export default function Play() {
 
     const { playGameState, currentPage, updatePlayGameState, fade } = usePlayGameState()
     const [globalState] = useGlobalState()
+
+
+    function resync() {
+        
+    }
 
     return (
         <div className='flex flex-col items-center'>
@@ -27,7 +33,7 @@ export default function Play() {
                 {process.env.NEXT_PUBLIC_DEV_MODE && <p>{globalState.name}</p>}
             </div>
             <FadeContainer fade={fade}>
-                <div className='pt-2'>
+                <div className='pt-2 relative flex flex-col items-center'>
                     {currentPage === 'ApproveRole' && (
                         <ApproveRole roleData={playGameState.roleData} updatePlayGameState={updatePlayGameState}/>
                     )}
@@ -61,6 +67,7 @@ export default function Play() {
                     {currentPage === 'Veto' && (
                         <Veto updatePlayGameState={updatePlayGameState}/>
                     )}
+                    <button className='text-sm text-white absolute top-[400px] opacity-10 bg-gray-900 rounded-md px-1'>resync</button>
                 </div>
             </FadeContainer>
             <p className='text-red-500 mt-2'>{playGameState.error}</p>

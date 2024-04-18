@@ -22,7 +22,22 @@ async function betterFetch(url: string): Promise<[any, string | null]> {
 }
 
 class Server {
-    public socket = io(api_url)
+    public socket = io(api_url, {
+        reconnection: true,
+        reconnectionAttempts: 5,
+        reconnectionDelay: 2000,
+    })
+    constructor() {
+        this.socket.on('disconnect', () => {
+            this.socket.connect()
+        })
+    }
+
+    public resync() {
+        this.socket.connect()
+
+        
+    }
 
     public createRoom(gameType: GameType) {
         this.socket.emit('createRoom', gameType)

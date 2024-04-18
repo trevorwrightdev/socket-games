@@ -1,5 +1,15 @@
 import { GameType, Player } from './utils'
 
+export type SocketEvent = {
+    event: string
+    data: any
+    timestamp: number
+}
+
+export type SocketEventMap = {
+    [key: string]: SocketEvent,
+}
+
 export default class Game {
     // key is socket id, value is player name
     public players: Player[] = []
@@ -10,6 +20,7 @@ export default class Game {
     public minPlayers: number = 0
     public maxPlayers: number = 20
     public inProgress: boolean = false
+    public pastSocketEvents: SocketEventMap = {}
 
     public addPlayer(socketId: string, name: string) {
         this.players.push({
@@ -21,5 +32,9 @@ export default class Game {
 
     public getPlayerBySocketId(socketId: string) {
         return this.players.find(p => p.socketId === socketId)
+    }
+
+    public addEvent(socketId: string, event: string, data: any) {
+        this.pastSocketEvents[socketId] = { event, data, timestamp: Date.now() }
     }
 }
