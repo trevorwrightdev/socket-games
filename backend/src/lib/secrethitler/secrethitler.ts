@@ -221,4 +221,40 @@ export class SecretHitler extends Game {
     public killPlayer(player: Player) {
         this.players = this.players.filter(p => p.clientId !== player.clientId)
     }
+
+    public swapSocketId(clientId: string, socketId: string): void {
+        super.swapSocketId(clientId, socketId)
+
+        if (this.president.clientId === clientId) {
+            this.president.socketId = socketId
+        }
+
+        if (this.chancellor.clientId === clientId) {
+            this.chancellor.socketId = socketId
+        }
+
+        if (this.runningPresident.clientId === clientId) {
+            this.runningPresident.socketId = socketId
+        }
+
+        if (this.runningChancellor.clientId === clientId) {
+            this.runningChancellor.socketId = socketId
+        }
+
+        if (this.roles.hitler.clientId === clientId) {
+            this.roles.hitler.socketId = socketId
+        }
+
+        for (const fascist of this.roles.fascists) {
+            if (fascist.clientId === clientId) {
+                fascist.socketId = socketId
+            }
+        }
+
+        for (const liberal of this.roles.liberals) {
+            if (liberal.clientId === clientId) {
+                liberal.socketId = socketId
+            }
+        }
+    }
 }

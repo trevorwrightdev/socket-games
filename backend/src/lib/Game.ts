@@ -38,4 +38,12 @@ export default class Game {
     public addEvent(clientId: string, event: string, data: any) {
         this.pastSocketEvents[clientId] = { event, data, timestamp: Date.now() }
     }
+
+    public swapSocketId(clientId: string, socketId: string) {
+        const player = this.players.find(player => player.clientId === clientId)
+        if (player) {
+            player.socketId = socketId
+            console.log(`${player.name} has new socket id: ${socketId}`)
+        }
+    }
 }

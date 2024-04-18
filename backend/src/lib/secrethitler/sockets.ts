@@ -75,7 +75,7 @@ export default function SecretHitlerSockets(io: Server, socket: CustomSocket, so
         currentGame.runningChancellor = player
 
         // emit to everyone a chancellor has been picked
-        socketGames.Broadcast('chancellorPicked', io, currentGame, {
+        socketGames.Broadcast('chancellorPicked', io, socket, currentGame, {
             chancellor: player,
             president: currentGame.players[currentGame.presidentIndex]
         })
@@ -159,6 +159,7 @@ export default function SecretHitlerSockets(io: Server, socket: CustomSocket, so
         const currentGame = game as SecretHitler
 
         socketGames.EmitToID(currentGame.host.socketId, 'chancellorPickPolicy', io, socket, `Chancellor ${currentGame.chancellor.name} is now choosing a policy to enact.`)
+        console.log('Emitting cards to chancellor...')
         socketGames.EmitToID(currentGame.chancellor.socketId, 'chancellorPickPolicy', io, socket, {
             policies: data,
             canVeto: currentGame.fascistPolicyCount >= 5

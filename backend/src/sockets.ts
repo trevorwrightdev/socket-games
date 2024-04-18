@@ -2,6 +2,7 @@ import { Socket, Server } from 'socket.io'
 import { GameType, CustomSocket } from './lib/utils'
 import { SocketGames } from './lib/SocketGames'
 import SecretHitlerSockets from './lib/secrethitler/sockets'
+import Game from './lib/Game'
 
 export default function socketEvents(io: Server, socket: CustomSocket, socketGames: SocketGames) {
     console.log(`User ${socket.handshake.query.clientId} connected.`)
@@ -20,21 +21,21 @@ export default function socketEvents(io: Server, socket: CustomSocket, socketGam
     })
 
     socket.on('resync', (lastWaitTimestamp: number) => {
-        const game = socketGames.getRoomAndReplaceSocketID(socket.handshake.query.clientId, socket.id)
+        const roomCode = socketGames.userToRoomCode[socket.handshake.query.clientId]
+        const game = socketGames.roomCodeToGame[roomCode]
         if (!game) {
-            console.log('room not found')
             socket.emit('error', 'Room not found.')
             return
         }
 
+        game.swapSocketId(socket.handshake.query.clientId, socket.id)
+
         const socketEvent = game.pastSocketEvents[socket.handshake.query.clientId]
         if (lastWaitTimestamp > socketEvent.timestamp) {
-            console.log('client is ahead')
             return
         }
 
-        io.to(socket.id).emit(socketEvent.event, socketEvent.data)
-
+        socketGames.EmitToID(socket.id, socketEvent.event, io, socket, socketEvent.data)
     })
 
     SecretHitlerSockets(io, socket, socketGames)
