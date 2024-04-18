@@ -20,7 +20,7 @@ const ChoosePlayerToKill:React.FC<ChoosePlayerToKill> = ({ playGameState, update
                     updatePlayGameState({ page: 'Waiting' })
                 }
 
-                return <RainbowButton key={player.socketId} onClick={killPlayer}>{player.name}</RainbowButton>
+                return <RainbowButton key={player.clientId} onClick={killPlayer}>{player.name}</RainbowButton>
             })}
         </div>
     )

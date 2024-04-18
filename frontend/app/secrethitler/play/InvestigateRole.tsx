@@ -26,7 +26,7 @@ const InvestigateRole:React.FC<InvestigateRoleProps> = ({ playGameState, updateP
             {!roleData && playGameState.playerList.map((player) => {
 
                 const investigatePlayer = async () => { 
-                    const [role, error] = await server.getRole(globalState.roomCode, player.socketId)
+                    const [role, error] = await server.getRole(globalState.roomCode, player.clientId)
                     if (error) return console.error(error)
                     setRoleData({
                         name: player.name,
@@ -34,7 +34,7 @@ const InvestigateRole:React.FC<InvestigateRoleProps> = ({ playGameState, updateP
                     })
                 }
 
-                return <RainbowButton key={player.socketId} onClick={investigatePlayer}>{player.name}</RainbowButton>
+                return <RainbowButton key={player.clientId} onClick={investigatePlayer}>{player.name}</RainbowButton>
             })}
             {roleData && (
                 <>

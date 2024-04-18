@@ -1,22 +1,22 @@
 import { Socket, Server } from 'socket.io'
 import { SocketGames } from '../SocketGames'
 import { SecretHitler, PresidentialPower } from './secrethitler'
-import { Player } from '../utils'
+import { CustomSocket, Player } from '../utils'
 import Game from '../Game'
 
 // socketGames.EmitToID(recipient, 'eventName', io, socket, data)
-export default function SecretHitlerSockets(io: Server, socket: Socket, socketGames: SocketGames) {
+export default function SecretHitlerSockets(io: Server, socket: CustomSocket, socketGames: SocketGames) {
 
     socketGames.On('startGame', socket, ({ game }) => {
         if (game.players.length < game.minPlayers) {
-            socketGames.EmitToID(game.host, 'error', io, socket, 'Not enough players to start the game.')
+            socketGames.EmitToID(game.host.socketId, 'error', io, socket, 'Not enough players to start the game.')
             return
         }
 
         const currentGame = game as SecretHitler
         currentGame.startGame()
         // emit to the host the game as begun.
-        socketGames.EmitToID(game.host, 'gameStarted', io, socket)
+        socketGames.EmitToID(game.host.socketId, 'gameStarted', io, socket)
     })
 
     socketGames.On('revealRoles', socket, ({ game }) => {
@@ -24,7 +24,7 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
 
         const hitlerData: { role: string, otherFascists: string[] }  = { role: 'hitler', otherFascists: [] }
         if (currentGame.players.length <= 6) {
-            hitlerData.otherFascists = currentGame.roles.fascists.filter(f => f.socketId !== currentGame.roles.hitler.socketId).map(f => f.name)
+            hitlerData.otherFascists = currentGame.roles.fascists.filter(f => f.clientId !== currentGame.roles.hitler.clientId).map(f => f.name)
         }
         socketGames.EmitToID(currentGame.roles.hitler.socketId, 'role', io, socket, hitlerData)
 
@@ -35,9 +35,9 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
         }
 
         for (const fascist of currentGame.roles.fascists) {
-            if (fascist.socketId === currentGame.roles.hitler.socketId) continue
+            if (fascist.clientId === currentGame.roles.hitler.clientId) continue
 
-            const otherFascists = currentGame.roles.fascists.filter(f => f.socketId !== fascist.socketId && f.socketId !== currentGame.roles.hitler.socketId).map(f => f.name)
+            const otherFascists = currentGame.roles.fascists.filter(f => f.clientId !== fascist.clientId && f.clientId !== currentGame.roles.hitler.clientId).map(f => f.name)
             socketGames.EmitToID(fascist.socketId, 'role', io, socket, {
                 role: 'fascist',
                 otherFascists: otherFascists,
@@ -49,13 +49,13 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
     function beginRound(currentGame: SecretHitler, specificPresident?: Player) {
         const gameOverMessage = currentGame.getGameOverMessage()
         if (gameOverMessage) {
-            socketGames.EmitToID(currentGame.host, 'gameOver', io, socket, gameOverMessage)
+            socketGames.EmitToID(currentGame.host.socketId, 'gameOver', io, socket, gameOverMessage)
             return
         }
 
         const president = specificPresident || currentGame.getNextPresident()
         currentGame.runningPresident = president
-        socketGames.EmitToID(currentGame.host, 'newPresident', io, socket, `${president.name} is the president. ${president.name}, please choose your chancellor.`)
+        socketGames.EmitToID(currentGame.host.socketId, 'newPresident', io, socket, `${president.name} is the president. ${president.name}, please choose your chancellor.`)
         socketGames.EmitToID(president.socketId, 'chooseChancellor', io, socket, currentGame.getEligibleChancellors(president))
     }
 
@@ -64,7 +64,7 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
         currentGame.roleApprovalCount++
 
         if (currentGame.roleApprovalCount === currentGame.players.length) {
-            socketGames.EmitToID(currentGame.host, 'showGameBoard', io, socket)
+            socketGames.EmitToID(currentGame.host.socketId, 'showGameBoard', io, socket)
             beginRound(currentGame)
         }
     })
@@ -83,8 +83,8 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
 
     socketGames.On('vote', socket, ({ game, data }) => {
         const currentGame = game as SecretHitler
-        const player = currentGame.players.find(p => p.socketId === socket.id)
-        socketGames.EmitToID(currentGame.host, 'vote', io, socket, { name: player?.name, vote: data })
+        const player = currentGame.players.find(p => p.clientId === socket.handshake.query.clientId)
+        socketGames.EmitToID(currentGame.host.socketId, 'vote', io, socket, { name: player?.name, vote: data })
 
         if (data) {
             currentGame.yesVotes++
@@ -99,14 +99,14 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
                 currentGame.chancellor = currentGame.runningChancellor
 
                 // Check for hitler election if 3 fascist policies
-                if (currentGame.fascistPolicyCount >= 3 && currentGame.chancellor.socketId === currentGame.roles.hitler.socketId) {
-                    socketGames.EmitToID(currentGame.host, 'role', io, socket, {
+                if (currentGame.fascistPolicyCount >= 3 && currentGame.chancellor.clientId === currentGame.roles.hitler.clientId) {
+                    socketGames.EmitToID(currentGame.host.socketId, 'role', io, socket, {
                         message: `${currentGame.roles.hitler.name} was Hitler and elected chancellor while 3 fascist policies had been enacted. Fascists win!`,
                         winners: 'fascist'
                     })
                 } else {
                     // emit to everyone that the vote passed
-                    socketGames.EmitToID(currentGame.host, 'votePassed', io, socket, 'The vote has passed. The president and chancellor will now enact a policy.')
+                    socketGames.EmitToID(currentGame.host.socketId, 'votePassed', io, socket, 'The vote has passed. The president and chancellor will now enact a policy.')
 
                     setTimeout(() => startPolicyPhase(currentGame), 5000)
                 }
@@ -132,7 +132,7 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
             game.chancellor = {} as Player
             game.president = {} as Player
 
-            socketGames.EmitToID(game.host, 'electionChaos', io, socket, {
+            socketGames.EmitToID(game.host.socketId, 'electionChaos', io, socket, {
                 message: `The election has failed 3 times in a row. The top policy card has been enacted and each player is now eligible for election. ${policy === 'fascist' && game.fascistPolicyCount === 5 ? 'Veto power is also unlocked.' : ''}`,
                 fascistPolicyCount: game.fascistPolicyCount,
                 liberalPolicyCount: game.liberalPolicyCount
@@ -140,7 +140,7 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
 
             electionFailed = true
         } else {
-            socketGames.EmitToID(game.host, 'voteFailed', io, socket, {message: veto ? 'The election tracker has been increased.' : 'The vote has failed. The next president will now nominate a chancellor.',
+            socketGames.EmitToID(game.host.socketId, 'voteFailed', io, socket, {message: veto ? 'The election tracker has been increased.' : 'The vote has failed. The next president will now nominate a chancellor.',
                 failedElectionCount: game.failedElectionCount
             })
         }
@@ -152,13 +152,13 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
         // at this point, the president and chancellor have been elected, and they need to enact policies
         const policyOptions = currentGame.getThreePolicyCards()
         socketGames.EmitToID(currentGame.president.socketId, 'presidentPickPolicy', io, socket, policyOptions)
-        socketGames.EmitToID(currentGame.host, 'presidentPickPolicy', io, socket, `President ${currentGame.president.name} is choosing a policy to discard.`)
+        socketGames.EmitToID(currentGame.host.socketId, 'presidentPickPolicy', io, socket, `President ${currentGame.president.name} is choosing a policy to discard.`)
     }
 
     socketGames.On('discardPolicy', socket, ({ game, data }) => {
         const currentGame = game as SecretHitler
 
-        socketGames.EmitToID(currentGame.host, 'chancellorPickPolicy', io, socket, `Chancellor ${currentGame.chancellor.name} is now choosing a policy to enact.`)
+        socketGames.EmitToID(currentGame.host.socketId, 'chancellorPickPolicy', io, socket, `Chancellor ${currentGame.chancellor.name} is now choosing a policy to enact.`)
         socketGames.EmitToID(currentGame.chancellor.socketId, 'chancellorPickPolicy', io, socket, {
             policies: data,
             canVeto: currentGame.fascistPolicyCount >= 5
@@ -169,8 +169,8 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
         const currentGame = game as SecretHitler
 
         currentGame.enactPolicy(data)
-        const playerName = currentGame.players.find(p => p.socketId === socket.id)?.name
-        socketGames.EmitToID(currentGame.host, 'newPolicyEnacted', io, socket, { fascistPolicyCount: currentGame.fascistPolicyCount, liberalPolicyCount: currentGame.liberalPolicyCount, playerName, newPolicy: data })
+        const playerName = currentGame.players.find(p => p.clientId === socket.handshake.query.clientId)?.name
+        socketGames.EmitToID(currentGame.host.socketId, 'newPolicyEnacted', io, socket, { fascistPolicyCount: currentGame.fascistPolicyCount, liberalPolicyCount: currentGame.liberalPolicyCount, playerName, newPolicy: data })
 
         setTimeout(() => {
             const power = currentGame.getPresidentialPower()
@@ -187,28 +187,28 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
         const president = currentGame.president
 
         if (power === 'investigate') {
-            socketGames.EmitToID(currentGame.host, 'message', io, socket, {
+            socketGames.EmitToID(currentGame.host.socketId, 'message', io, socket, {
                 message: `President ${currentGame.president.name} is now investigating a player's party.`,
                 color: 'black'
             })
             socketGames.EmitToID(president.socketId, 'investigation', io, socket, currentGame.getPlayersToInvestigate(president))
         } else if (power === 'pick president') {
             // pick next president
-            socketGames.EmitToID(currentGame.host, 'message', io, socket, {
+            socketGames.EmitToID(currentGame.host.socketId, 'message', io, socket, {
                 message: `President ${currentGame.president.name} is now choosing the next president.`,
                 color: 'black'
             })
             socketGames.EmitToID(currentGame.president.socketId, 'pickNextPresident', io, socket, currentGame.getPlayersBesides(currentGame.president))
         } else if (power === 'peek') {
             // peek top 3 cards
-            socketGames.EmitToID(currentGame.host, 'message', io, socket, {
+            socketGames.EmitToID(currentGame.host.socketId, 'message', io, socket, {
                 message: `President ${currentGame.president.name} is now peeking at the top 3 policy cards in the deck.`,
                 color: 'black'
             })
             socketGames.EmitToID(currentGame.president.socketId, 'peek', io, socket, currentGame.peekTopThreePolicies())
         } else if (power === 'kill') {
             // kill player
-            socketGames.EmitToID(currentGame.host, 'message', io, socket, {
+            socketGames.EmitToID(currentGame.host.socketId, 'message', io, socket, {
                 message: `President ${currentGame.president.name} is now choosing a player to kill!`,
                 color: 'red'
             })
@@ -219,7 +219,7 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
     socketGames.On('finishedInvestigation', socket, ({ game, data }) => {
         const currentGame = game as SecretHitler
         const playerInvestigatedName = data
-        socketGames.EmitToID(currentGame.host, 'message', io, socket, {
+        socketGames.EmitToID(currentGame.host.socketId, 'message', io, socket, {
             message: `President ${currentGame.president.name} has investigated ${playerInvestigatedName}.`,
             color: 'black'
         })
@@ -233,7 +233,7 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
         const newPresident = data as Player
         const currentGame = game as SecretHitler
 
-        socketGames.EmitToID(currentGame.host, 'message', io, socket, {
+        socketGames.EmitToID(currentGame.host.socketId, 'message', io, socket, {
             message: `President ${currentGame.president.name} has chosen ${newPresident.name} as the next president.`,
             color: 'black'
         })
@@ -252,15 +252,15 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
         const playerToKill = data as Player
 
         currentGame.killPlayer(playerToKill)
-        socketGames.EmitToID(currentGame.host, 'message', io, socket, {
+        socketGames.EmitToID(currentGame.host.socketId, 'message', io, socket, {
             message: `President ${currentGame.president.name} has killed ${playerToKill.name}!`,
             color: 'red'
         })
         socketGames.EmitToID(playerToKill.socketId, 'youDied', io, socket)
 
         setTimeout(() => {
-            if (playerToKill.socketId === currentGame.roles.hitler.socketId) {
-                socketGames.EmitToID(currentGame.host, 'gameOver', io, socket, {
+            if (playerToKill.clientId === currentGame.roles.hitler.clientId) {
+                socketGames.EmitToID(currentGame.host.socketId, 'gameOver', io, socket, {
                     message: `${currentGame.roles.hitler.name} was Hitler and has been killed. Liberals win!`,
                     winners: 'liberal'
                 })
@@ -272,7 +272,7 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
 
     socketGames.On('requestVeto', socket, ({ game }) => {
         const currentGame = game as SecretHitler
-        socketGames.EmitToID(currentGame.host, 'message', io, socket, {
+        socketGames.EmitToID(currentGame.host.socketId, 'message', io, socket, {
             message: `Chancellor ${currentGame.chancellor.name} has requested a veto from President ${currentGame.president.name}.`,
             color: 'black'
         })
@@ -285,7 +285,7 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
 
         if (veto) {
             socketGames.EmitToID(currentGame.chancellor.socketId, 'vetoResult', io, socket, true)
-            socketGames.EmitToID(currentGame.host, 'message', io, socket, {
+            socketGames.EmitToID(currentGame.host.socketId, 'message', io, socket, {
                 message: `President ${currentGame.president.name} has accepted the veto request from chancellor ${currentGame.chancellor.name}.`,
                 color: 'green'
             })
@@ -298,7 +298,7 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
             }, 5000)
         } else {
             socketGames.EmitToID(currentGame.chancellor.socketId, 'vetoResult', io, socket, false)
-            socketGames.EmitToID(currentGame.host, 'message', io, socket, {
+            socketGames.EmitToID(currentGame.host.socketId, 'message', io, socket, {
                 message: `President ${currentGame.president.name} has denied the veto request from chancellor ${currentGame.chancellor.name}.`,
                 color: 'red'
             })

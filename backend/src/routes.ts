@@ -17,20 +17,19 @@ export default function routes(socketGames: SocketGames): Router {
 
     router.get('/getrole', (req, res) => {
         const code = req.query.code
-        const playerSocketId = req.query.playerSocketId
-        console.log(code, playerSocketId)
+        const playerClientId = req.query.playerClientId
         if (!code) {
             res.status(400).json({ error: "Invalid code." })
             return
         }
-        if (!playerSocketId) {
+        if (!playerClientId) {
             res.status(400).json({ error: "Invalid player." })
             return
         }
 
         const game = socketGames.roomCodeToGame[code as string] as SecretHitler
 
-        const player = game.getPlayerBySocketId(playerSocketId as string)
+        const player = game.getPlayerByClientId(playerClientId as string)
 
         if (!player) {
             res.status(400).json({ error: "Invalid player." })
@@ -45,20 +44,20 @@ export default function routes(socketGames: SocketGames): Router {
             return
         }
 
-        if (game.roles.hitler.socketId === playerSocketId) {
+        if (game.roles.hitler.clientId === playerClientId) {
             res.json({ role: 'fascist' })
             return
         } 
 
         for (const player of game.roles.fascists) {
-            if (player.socketId === playerSocketId) {
+            if (player.clientId === playerClientId) {
                 res.json({ role: 'fascist' })
                 return
             }
         }
 
         for (const player of game.roles.liberals) {
-            if (player.socketId === playerSocketId) {
+            if (player.clientId === playerClientId) {
                 res.json({ role: 'liberal' })
                 return
             }

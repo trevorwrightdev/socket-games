@@ -20,10 +20,12 @@ export interface PlayGameState {
 
 const defaultGameState: PlayGameState = { page: 'Waiting', error: '', playerList: [], president: {} as Player, chancellor: {} as Player, policies: [], message: 'none', canVeto: false }
 
-export function usePlayGameState(): { playGameState: PlayGameState; updatePlayGameState: UpdatePlayGameState, fade: boolean, currentPage: Page } {
+export function usePlayGameState(): { playGameState: PlayGameState; updatePlayGameState: UpdatePlayGameState, fade: boolean, currentPage: Page, lastWaitTimestamp: number, connected: boolean} {
     const [playGameState, setPlayGameState] = useState<PlayGameState>(defaultGameState)
     const [currentPage, setCurrentPage] = useState<Page>(playGameState.page)
     const [fade, setFade] = useState<boolean>(false)
+    const [lastWaitTimestamp, setLastWaitTimestamp] = useState<number>(0)
+    const [connected, setConnected] = useState<boolean>(false)
 
     function updatePlayGameState(newState: Partial<PlayGameState>) {
         setPlayGameState({
@@ -33,6 +35,10 @@ export function usePlayGameState(): { playGameState: PlayGameState; updatePlayGa
     }
 
     useEffect(() => {
+        if (playGameState.page === 'Waiting') {
+            setLastWaitTimestamp(Date.now())
+        }
+
         setFade(true)
         setTimeout(() => {
             setCurrentPage(playGameState.page)
@@ -90,6 +96,7 @@ export function usePlayGameState(): { playGameState: PlayGameState; updatePlayGa
             server.socket.off('peek')
             server.socket.off('kill')
             server.socket.off('youDied')
+            server.socket.off('requestVeto')
         }
     }, [playGameState])
 
@@ -98,5 +105,7 @@ export function usePlayGameState(): { playGameState: PlayGameState; updatePlayGa
         updatePlayGameState,
         fade,
         currentPage,
+        lastWaitTimestamp,
+        connected
     }
 }
