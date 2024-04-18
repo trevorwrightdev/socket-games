@@ -20,9 +20,10 @@ const PickPolicyAsChancellor:React.FC<PickPolicyAsChancellorProps> = ({ playGame
 
     useEffect(() => {
         server.socket.on('vetoResult', (veto: boolean) => {
-            console.log('got message')
             if (veto === false) {
                 setVetoFailed(true)
+            } else {
+                updatePlayGameState({ page: 'Waiting' })
             }
         })
 

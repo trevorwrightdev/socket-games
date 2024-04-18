@@ -156,7 +156,7 @@ export class SecretHitler extends Game {
         } else {
             this.liberalPolicyCount++
         }
-
+        this.failedElectionCount = 0
         // reshuffle the deck if there are less than 3 cards left
         if (this.policyDeck.length < 3) {
             this.shufflePolicyDeck()

@@ -96,8 +96,6 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
 
         if (currentGame.yesVotes + currentGame.noVotes === currentGame.players.length) {
             if (currentGame.yesVotes > currentGame.noVotes) {
-                currentGame.failedElectionCount = 0
-
                 // now we have successfully elected these players
                 currentGame.president = currentGame.runningPresident
                 currentGame.chancellor = currentGame.runningChancellor
@@ -115,38 +113,42 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
                     setTimeout(() => startPolicyPhase(currentGame), 5000)
                 }
             } else {
-                currentGame.failedElectionCount++
+                incrementFailedElectionCount(currentGame, false)
 
-                if (currentGame.failedElectionCount >= 3) {
-                    const policy = currentGame.getOnePolicyCard()
-                    currentGame.enactPolicy(policy)
-                    // reset last chancellor and president 
-                    currentGame.chancellor = {} as Player
-                    currentGame.president = {} as Player
-
-                    io.to(currentGame.host).emit('electionChaos', {
-                        message: 'The election has failed 3 times in a row. The top policy card has been enacted and each player is now eligible for election.',
-                        fascistPolicyCount: currentGame.fascistPolicyCount,
-                        liberalPolicyCount: currentGame.liberalPolicyCount
-                    })
-
-                    setTimeout(() => beginRound(currentGame), 5000)
-                } else {
-                    // emit to the host that the vote failed
-                    io.to(currentGame.host).emit('voteFailed', {
-                        message: 'The vote has failed. The next president will now nominate a chancellor.',
-                        failedElectionCount: currentGame.failedElectionCount
-                    })
-
-                    setTimeout(() => beginRound(currentGame), 5000)
-                }
-                
+                setTimeout(() => beginRound(currentGame), 5000)
             }
             // reset votes
             currentGame.yesVotes = 0
             currentGame.noVotes = 0
         }
     })
+
+    function incrementFailedElectionCount(game: SecretHitler, veto: boolean) {
+        game.failedElectionCount++
+
+        let electionFailed = false
+        if (game.failedElectionCount >= 3) {
+            const policy = game.getOnePolicyCard()
+            game.enactPolicy(policy)
+            // reset last chancellor and president 
+            game.chancellor = {} as Player
+            game.president = {} as Player
+
+            io.to(game.host).emit('electionChaos', {
+                message: `The election has failed 3 times in a row. The top policy card has been enacted and each player is now eligible for election. ${policy === 'fascist' && game.fascistPolicyCount === 5 ? 'Veto power is also unlocked.' : ''}`,
+                fascistPolicyCount: game.fascistPolicyCount,
+                liberalPolicyCount: game.liberalPolicyCount
+            })
+
+            electionFailed = true
+        } else {
+            // emit to the host that the vote failed
+            io.to(game.host).emit('voteFailed', {
+                message: veto ? 'The election tracker has been increased.' : 'The vote has failed. The next president will now nominate a chancellor.',
+                failedElectionCount: game.failedElectionCount
+            })
+        }
+    }
 
     function startPolicyPhase(game: Game) {
         const currentGame = game as SecretHitler
@@ -289,7 +291,18 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
         const veto = data as boolean
 
         if (veto) {
+            io.to(currentGame.chancellor.socketId).emit('vetoResult', true)
+            io.to(currentGame.host).emit('message', {
+                message: `President ${currentGame.president.name} has accepted the veto request from chancellor ${currentGame.chancellor.name}.`,
+                color: 'green'
+            })
 
+            setTimeout(() => {
+                incrementFailedElectionCount(game as SecretHitler, true)
+                setTimeout(() => {
+                    beginRound(game as SecretHitler)
+                }, 5000)
+            }, 5000)
         } else {
             io.to(currentGame.chancellor.socketId).emit('vetoResult', false)
             io.to(currentGame.host).emit('message', {

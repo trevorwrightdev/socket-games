@@ -83,7 +83,6 @@ export function useHostGameState(): { hostGameState: HostGameState; updateHostGa
         })
         server.socket.on('votePassed', (message: string) => {
             updateHostGameState({showVoteBoard: true, message, messageColor: 'green'})
-            setFailedElectionCount(0)
         })
         server.socket.on('voteFailed', (data: any) => {
             updateHostGameState({ showVoteBoard: true, message: data.message, messageColor: 'red' })
@@ -100,6 +99,7 @@ export function useHostGameState(): { hostGameState: HostGameState; updateHostGa
                 fascistPolicyCount: data.fascistPolicyCount,
                 liberalPolicyCount: data.liberalPolicyCount
             })
+            setFailedElectionCount(0)
             updateHostGameState({ message: `${data.playerName} has enacted a ${data.newPolicy.toUpperCase()} policy. ${data.fascistPolicyCount == 5 && data.newPolicy === 'fascist' ? 'Veto power is also unlocked.' : ''}`, messageColor: data.newPolicy === 'fascist' ? 'red' : 'blue'})
         })
         server.socket.on('electionChaos', (data) => {
