@@ -22,16 +22,18 @@ export default function socketEvents(io: Server, socket: CustomSocket, socketGam
     socket.on('resync', (lastWaitTimestamp: number) => {
         const game = socketGames.getRoomAndReplaceSocketID(socket.handshake.query.clientId, socket.id)
         if (!game) {
+            console.log('room not found')
             socket.emit('error', 'Room not found.')
             return
         }
 
         const socketEvent = game.pastSocketEvents[socket.handshake.query.clientId]
         if (lastWaitTimestamp > socketEvent.timestamp) {
+            console.log('client is ahead')
             return
         }
 
-        io.to(socket.id).emit('resync', game.pastSocketEvents[socket.handshake.query.clientId])
+        io.to(socket.id).emit(socketEvent.event, socketEvent.data)
 
     })
 
