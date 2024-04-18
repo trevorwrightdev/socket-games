@@ -10,6 +10,10 @@ export type SocketEventMap = {
     [key: string]: SocketEvent,
 }
 
+export type SendEventTimestamps = {
+    [key: string]: number
+}
+
 export default class Game {
     // key is socket id, value is player name
     public players: Player[] = []
@@ -20,7 +24,8 @@ export default class Game {
     public minPlayers: number = 0
     public maxPlayers: number = 20
     public inProgress: boolean = false
-    public pastSocketEvents: SocketEventMap = {}
+    public pastEmitEvents: SocketEventMap = {}
+    public sendEventTimestamps: SendEventTimestamps = {}
 
     public addPlayer(clientId: string, name: string, socketId: string) {
         this.players.push({
@@ -36,7 +41,11 @@ export default class Game {
     }
 
     public addEvent(clientId: string, event: string, data: any) {
-        this.pastSocketEvents[clientId] = { event, data, timestamp: Date.now() }
+        this.pastEmitEvents[clientId] = { event, data, timestamp: Date.now() }
+    }
+
+    public addSendEventTimestamp(clientId: string) {
+        this.sendEventTimestamps[clientId] = Date.now()
     }
 
     public swapSocketId(clientId: string, socketId: string) {

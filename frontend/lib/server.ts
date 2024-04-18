@@ -44,10 +44,10 @@ class Server {
         })
     }
 
-    public resync(timestamp: number) {
+    public resync() {
         this.socket.connect()
 
-        this.socket.emit('resync', timestamp)
+        this.socket.emit('resync')
     }
 
     public createRoom(gameType: GameType) {
