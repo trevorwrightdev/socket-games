@@ -165,8 +165,7 @@ export default function SecretHitlerSockets(io: Server, socket: Socket, socketGa
         io.to(currentGame.host).emit('chancellorPickPolicy', `Chancellor ${currentGame.chancellor.name} is now choosing a policy to enact.`)
         io.to(currentGame.chancellor.socketId).emit('chancellorPickPolicy', {
             policies: data,
-            // TODO: Change to if fascist policy count is greater than 5
-            canVeto: true
+            canVeto: currentGame.fascistPolicyCount >= 5
         })
     })
 
