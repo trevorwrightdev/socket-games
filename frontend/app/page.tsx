@@ -97,6 +97,9 @@ export default function Home() {
                 )
             })}
         </div>
+        <div className='bg-white fixed bottom-0 w-full h-8 grid place-items-center'>
+            <a href="https://github.com/trevorwrightdev/socket-games" target="_blank" rel="noopener noreferrer" className='underline text-gray-500 text-xs'>see the code</a>
+        </div>
     </main>
   )
 }

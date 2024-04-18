@@ -35,6 +35,11 @@ const MainMenu:React.FC<MainMenuProps> = ({ updateHostGameState, hostGameState }
             <Link href='/'>
                 <CoolButton>Back</CoolButton>
             </Link>
+            <p className='text-xs text-gray-500 max-w-[500px] text-center'>
+                Secret Hitler is under the <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener noreferrer" className='underline'>creative commons license</a>.
+                I have taken the rules of the game and created my own version that can be played through a web browser with friends online.
+                The official game can be bought <a href="https://www.secrethitler.com/" target="_blank" rel="noopener noreferrer" className='underline'>here</a>.
+            </p>
         </div>
     )
 }
