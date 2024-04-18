@@ -20,7 +20,7 @@ export default function socketEvents(io: Server, socket: CustomSocket, socketGam
         console.log(`User ${socket.handshake.query.clientId} disconnected.`)
     })
 
-    socket.on('resync', (lastWaitTimestamp: number) => {
+    socket.on('resync', () => {
         const roomCode = socketGames.userToRoomCode[socket.handshake.query.clientId]
         const game = socketGames.roomCodeToGame[roomCode]
         if (!game) {
@@ -30,8 +30,9 @@ export default function socketEvents(io: Server, socket: CustomSocket, socketGam
 
         game.swapSocketId(socket.handshake.query.clientId, socket.id)
 
-        const socketEvent = game.pastSocketEvents[socket.handshake.query.clientId]
-        if (lastWaitTimestamp > socketEvent.timestamp) {
+        const socketEvent = game.pastEmitEvents[socket.handshake.query.clientId]
+        const lastSendEventTimestamp = game.sendEventTimestamps[socket.handshake.query.clientId] || 0
+        if (lastSendEventTimestamp > socketEvent.timestamp) {
             return
         }
 

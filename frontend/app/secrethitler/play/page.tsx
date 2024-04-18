@@ -18,11 +18,11 @@ import server from '@/lib/server'
 
 export default function Play() {
 
-    const { playGameState, currentPage, updatePlayGameState, fade, lastWaitTimestamp } = usePlayGameState()
+    const { playGameState, currentPage, updatePlayGameState, fade } = usePlayGameState()
     const [globalState] = useGlobalState()
 
     function resync() {
-        server.resync(lastWaitTimestamp)
+        server.resync()
     }
 
     return (

@@ -102,6 +102,7 @@ export class SocketGames {
                 socket.emit('error', 'You are not in this room, or this room does not exist.')
                 return
             }
+            game.addSendEventTimestamp(socket.handshake.query.clientId)
             callback({ game, data })
         })
     }
