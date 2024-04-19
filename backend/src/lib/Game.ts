@@ -43,7 +43,6 @@ export default class Game {
         const player = this.players.find(player => player.clientId === clientId)
         if (player) {
             player.socketId = socketId
-            console.log(`${player.name} has new socket id: ${socketId}`)
         }
     }
 }

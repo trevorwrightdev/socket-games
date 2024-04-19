@@ -91,13 +91,12 @@ export default function SecretHitlerSockets(io: Server, socket: CustomSocket, so
         const currentGame = game as SecretHitler
         const player = currentGame.players.find(p => p.clientId === socket.handshake.query.clientId)
         socketGames.EmitToID(currentGame.host.socketId, 'vote', io, socket, { name: player?.name, vote: data })
+        // TODO: Fix the issue where frontend votes are not accurate 
 
         if (data) {
             currentGame.yesVotes++
-            console.log(`${player!.name} voted yes.`)
         } else {
             currentGame.noVotes++
-            console.log(`${player!.name} voted no.`)
         }
 
         if (currentGame.yesVotes + currentGame.noVotes === currentGame.players.length) {
@@ -115,13 +114,10 @@ export default function SecretHitlerSockets(io: Server, socket: CustomSocket, so
                 } else {
                     // emit to everyone that the vote passed
                     socketGames.EmitToID(currentGame.host.socketId, 'votePassed', io, socket, 'The vote has passed. The president and chancellor will now enact a policy.')
-                    console.log('Vote passed.')
                     setTimeout(() => startPolicyPhase(currentGame), 5000)
                 }
             } else {
                 incrementFailedElectionCount(currentGame, false)
-                console.log('Vote failed.')
-
                 setTimeout(() => beginRound(currentGame), 5000)
             }
             // reset votes

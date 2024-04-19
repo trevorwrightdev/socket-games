@@ -36,7 +36,6 @@ export function usePlayGameState(): { playGameState: PlayGameState; updatePlayGa
     useEffect(() => {
         if (playGameState.page === 'Waiting') {
             setLastWaitTimestamp(Date.now())
-            console.log(Date.now())
         }
 
         setFade(true)

@@ -13,7 +13,6 @@ export interface HostGameState {
     players: Player[]
     message: string
     messageColor: string
-    votes: { vote: boolean, name: string }[]
     showVoteBoard: boolean
 }
 
@@ -24,18 +23,21 @@ const defaultGameState: HostGameState = {
     players: [], 
     message: '', 
     messageColor: 'black', 
-    votes: [], 
     showVoteBoard: false, 
 }
 
 type PolicyState = { fascistPolicyCount: number, liberalPolicyCount: number } 
 
-export function useHostGameState(): { hostGameState: HostGameState; updateHostGameState: UpdateHostGameState, fade: boolean, currentPage: Page, policyState: PolicyState, failedElectionCount: number} {
+export type Vote = { vote: boolean, name: string }
+
+export function useHostGameState(): { hostGameState: HostGameState; updateHostGameState: UpdateHostGameState, fade: boolean, currentPage: Page, policyState: PolicyState, failedElectionCount: number, votes: Vote[] } {
     const [hostGameState, setHostGameState] = useState<HostGameState>(defaultGameState)
     const [currentPage, setCurrentPage] = useState<Page>(hostGameState.page)
     const [fade, setFade] = useState<boolean>(false)
     const [policyState, setPolicyState] = useState<PolicyState>({ fascistPolicyCount: 0, liberalPolicyCount: 0 })
     const [failedElectionCount, setFailedElectionCount] = useState<number>(0)
+    const [votes, setVotes] = useState<Vote[]>([])
+    const voteRef = useRef<Vote[]>(votes)
 
     function updateHostGameState(newState: Partial<HostGameState>) {
         setHostGameState({
@@ -69,7 +71,9 @@ export function useHostGameState(): { hostGameState: HostGameState; updateHostGa
             updateHostGameState({ page: 'Game Board' })
         })
         server.socket.on('newPresident', (message: string) => {
-            updateHostGameState({ votes: [], showVoteBoard: false, message, messageColor: 'black'})
+            updateHostGameState({ showVoteBoard: false, message, messageColor: 'black'})
+            voteRef.current = []
+            setVotes(voteRef.current)
 
             if (failedElectionCount >= 3) {
                 setFailedElectionCount(0)
@@ -79,7 +83,8 @@ export function useHostGameState(): { hostGameState: HostGameState; updateHostGa
             updateHostGameState({ message: `${president.name} has nominated ${chancellor.name} as chancellor. Please vote to decide if these players should be elected.`, messageColor: 'black'})
         })
         server.socket.on('vote', (voteData: { vote: boolean, name: string }) => {
-            updateHostGameState({ votes: [...hostGameState.votes, voteData] })  
+            voteRef.current.push(voteData)
+            setVotes(voteRef.current)
         })
         server.socket.on('votePassed', (message: string) => {
             updateHostGameState({showVoteBoard: true, message, messageColor: 'green'})
@@ -89,7 +94,9 @@ export function useHostGameState(): { hostGameState: HostGameState; updateHostGa
             setFailedElectionCount(data.failedElectionCount)
         })
         server.socket.on('presidentPickPolicy', (message: string) => {
-            updateHostGameState({ message, messageColor: 'black', showVoteBoard: false, votes: []})
+            updateHostGameState({ message, messageColor: 'black', showVoteBoard: false })
+            voteRef.current = []
+            setVotes(voteRef.current)
         })
         server.socket.on('chancellorPickPolicy', (message: string) => {
             updateHostGameState({ message, messageColor: 'black'})
@@ -144,6 +151,7 @@ export function useHostGameState(): { hostGameState: HostGameState; updateHostGa
         fade,
         currentPage,
         policyState,
-        failedElectionCount
+        failedElectionCount,
+        votes
     }
 }

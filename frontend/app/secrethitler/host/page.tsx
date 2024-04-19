@@ -8,7 +8,7 @@ import GameBoard from './GameBoard/GameBoard'
 
 export default function SecretHitlerHostPage() {
 
-    const { hostGameState, updateHostGameState, fade, currentPage, policyState, failedElectionCount } = useHostGameState()
+    const { hostGameState, updateHostGameState, fade, currentPage, policyState, failedElectionCount, votes } = useHostGameState()
 
   return (
     <FadeContainer fade={fade}>
@@ -24,7 +24,7 @@ export default function SecretHitlerHostPage() {
                     <Countdown hostGameState={hostGameState} updateHostGameState={updateHostGameState}/>
                 )}
                 {currentPage === 'Game Board' && (
-                    <GameBoard hostGameState={hostGameState} fascistPolicyCount={policyState.fascistPolicyCount} liberalPolicyCount={policyState.liberalPolicyCount} failedElectionCount={failedElectionCount}/>
+                    <GameBoard hostGameState={hostGameState} fascistPolicyCount={policyState.fascistPolicyCount} liberalPolicyCount={policyState.liberalPolicyCount} failedElectionCount={failedElectionCount} votes={votes}/>
                 )} 
                 <p className='text-red-500'>{hostGameState.error}</p>
             </div>
